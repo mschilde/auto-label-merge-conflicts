@@ -1,0 +1,6 @@
+FROM node:10.15.1
+
+COPY . .
+RUN yarn install
+
+WORKDIR /home/autolabel
