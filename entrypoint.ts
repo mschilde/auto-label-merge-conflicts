@@ -1,18 +1,19 @@
 import { Toolkit } from 'actions-toolkit';
+import * as _ from 'lodash';
 
 const tools = new Toolkit({
-  event: ['pull_request.opened', 'pull_request.synchronize'],
+  event: ['pull_request.opened', 'pull_request.synchronize']
 });
 
 export const getPullRequests = (
   tools: Toolkit,
   {
     owner,
-    repo,
+    repo
   }: {
     owner: string;
     repo: string;
-  },
+  }
 ) => {
   const query = `{
     repository(owner: "${owner}", name: "${repo}") {
@@ -37,7 +38,7 @@ export const getPullRequests = (
   }`;
 
   return tools.github.graphql(query, {
-    headers: { Accept: 'application/vnd.github.ocelot-preview+json' },
+    headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
   });
 };
 

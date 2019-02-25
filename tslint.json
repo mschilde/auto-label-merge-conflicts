@@ -1,0 +1,19 @@
+{
+  "extends": ["tslint-config-prettier"],
+  "rules": {
+    "no-unused-expression": true,
+    "no-use-before-declare": false,
+    "no-var-keyword": true,
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "lowercase-last",
+        "named-imports-order": "lowercase-last"
+      }
+    ],
+    "no-this-assignment": true,
+    "import-spacing": true,
+    "no-redundant-jsdoc": true
+  },
+  "no-parameter-reassignment": true
+}
