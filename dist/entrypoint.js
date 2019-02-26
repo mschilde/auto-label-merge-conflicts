@@ -47,10 +47,12 @@ exports.getPullRequests = (tools, { owner, repo }) => {
     console.log(result.repository.pullRequests.edges);
     console.log(result.repository.labels.edges);
     let conflictLabel = result.repository.labels.edges.find((label) => {
+        console.log(label);
+        console.log(label.name);
         return (label.name === process.env['CONFLICT_LABEL']);
     });
     console.log(conflictLabel);
     if (!conflictLabel) {
-        tools.exit.failure(`${process.env['CONFLICT_LABEL']} not found in your repository`);
+        tools.exit.failure(`"${process.env['CONFLICT_LABEL']}" label not found in your repository!`);
     }
 })();
