@@ -64,7 +64,7 @@ const addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
     });
     if (pullrequestsWithConflicts.length > 0) {
         pullrequestsWithConflicts.forEach(async (pullrequest) => {
-            tools.log.info(`Labeling ${pullrequest.node.number}`);
+            tools.log.info(`Labeling PR #${pullrequest.node.number}`);
             try {
                 await addLabelsToLabelable(tools, {
                     labelIds: conflictLabel.node.id,
