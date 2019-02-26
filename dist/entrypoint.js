@@ -49,8 +49,18 @@ exports.getPullRequests = (tools, { owner, repo }) => {
     let conflictLabel = result.repository.labels.edges.find((label) => {
         return (label.node.name === process.env['CONFLICT_LABEL']);
     });
-    console.log(conflictLabel);
     if (!conflictLabel) {
         tools.exit.failure(`"${process.env['CONFLICT_LABEL']}" label not found in your repository!`);
+    }
+    let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter((pullrequest) => {
+        return (pullrequest.node.mergeable === 'CONFLICTING');
+    });
+    if (pullrequestsWithConflicts.length > 0) {
+        pullrequestsWithConflicts.forEach((pullrequest) => {
+            console.log(pullrequest.node.id);
+        });
+    }
+    else {
+        tools.exit.success('No PR has conflicts, congrats!');
     }
 })();

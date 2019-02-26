@@ -5,10 +5,18 @@ const tools = new Toolkit({
   event: ['pull_request.opened', 'pull_request.synchronize']
 });
 
-interface GithubLabel {
+interface GithubLabelNode {
   node: {
     id: string;
     name: string;
+  }
+}
+
+interface GithubPRNode {
+  node: {
+    id: string;
+    number: string;
+    mergeable: string;
   }
 }
 
@@ -68,14 +76,24 @@ export const getPullRequests = (
   console.log(result.repository.pullRequests.edges);
   console.log(result.repository.labels.edges);
 
-  let conflictLabel = result.repository.labels.edges.find((label: GithubLabel) => {
+  let conflictLabel = result.repository.labels.edges.find((label: GithubLabelNode) => {
     return (label.node.name === process.env['CONFLICT_LABEL']);
   });
 
-  console.log(conflictLabel);
-
   if (!conflictLabel) {
     tools.exit.failure(`"${process.env['CONFLICT_LABEL']}" label not found in your repository!`);
+  }
+
+  let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter((pullrequest: GithubPRNode) => {
+    return (pullrequest.node.mergeable === 'CONFLICTING');
+  });
+
+  if (pullrequestsWithConflicts.length > 0) {
+    pullrequestsWithConflicts.forEach((pullrequest: GithubPRNode) => {
+      console.log(pullrequest.node.id);
+    })
+  } else {
+    tools.exit.success('No PR has conflicts, congrats!')
   }
 
 })();
