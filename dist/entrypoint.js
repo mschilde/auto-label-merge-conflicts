@@ -42,4 +42,5 @@ exports.getPullRequests = (tools, { owner, repo }) => {
     console.log('Result: ', result);
     console.log(result.repository.pullRequests.edges);
     console.log(result.repository.labels.edges);
+    console.log(process.env['CONFLICT_LABEL']);
 })();
