@@ -19,7 +19,7 @@ interface GithubPRNode {
   }
 }
 
-export const getPullRequests = (
+const getPullRequests = (
   tools: Toolkit,
   {
     owner,
@@ -56,7 +56,7 @@ export const getPullRequests = (
   });
 };
 
-export const addLabelsToLabelable = (
+const addLabelsToLabelable = (
   tools: Toolkit,
   {
     labelIds,
@@ -80,8 +80,8 @@ export const addLabelsToLabelable = (
 
 (async () => {
   // check configuration
-  if (!process.env['CONFLICT_LABEL']) {
-    tools.exit.failure('Please set environment variable CONFLICT_LABEL');
+  if (!process.env['CONFLICT_LABEL_NAME']) {
+    tools.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
   }
 
   let result;
@@ -93,11 +93,11 @@ export const addLabelsToLabelable = (
   }
 
   let conflictLabel = result.repository.labels.edges.find((label: GithubLabelNode) => {
-    return (label.node.name === process.env['CONFLICT_LABEL']);
+    return (label.node.name === process.env['CONFLICT_LABEL_NAME']);
   });
 
   if (!conflictLabel) {
-    tools.exit.failure(`"${process.env['CONFLICT_LABEL']}" label not found in your repository!`);
+    tools.exit.failure(`"${process.env['CONFLICT_LABEL_NAME']}" label not found in your repository!`);
   }
 
   let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter((pullrequest: GithubPRNode) => {
@@ -106,16 +106,18 @@ export const addLabelsToLabelable = (
 
   if (pullrequestsWithConflicts.length > 0) {
     pullrequestsWithConflicts.forEach(async (pullrequest: GithubPRNode) => {
+      tools.log.info(`Labeling ${pullrequest.node.number}`);
       try {
         await addLabelsToLabelable(tools, {
           labelIds: conflictLabel.node.id,
           labelableId: pullrequest.node.id,
         });
       } catch (error) {
-        tools.exit.failure('addLabelsToLabelable has failed. ');
+        tools.exit.failure('addLabelsToLabelable has failed');
       }
     })
   } else {
+    // nothing to do
     tools.exit.success('No PR has conflicts, congrats!')
   }
 
