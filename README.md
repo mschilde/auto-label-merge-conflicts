@@ -3,7 +3,9 @@
 
 ## Set up
 
-To configure the action simply add the following lines to your `.github/main.workflow` workflow file:
+To configure the action on your repo you have to do 2 things:
+ 
+1) add the following code to your `.github/main.workflow` workflow file:
 
 ```
 workflow "auto-label merge conflicts" {
@@ -20,9 +22,9 @@ action "Auto label merge conflicts" {
 }
 ```
 
-Please note the parameter `CONFLICT_LABEL_NAME`. This should be set to the name of the label you want to apply to PRs with merge conflicts.
+2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
 
-This label **has to exist** on your repo or the action will **fail**. Just create the label manually.
+This label will then be applied to PRs with merge conflicts. Just set it up manually if you haven't done so.
 
 ## What does this action do?
 
