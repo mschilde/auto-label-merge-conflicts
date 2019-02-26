@@ -24,7 +24,8 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     if (!conflictLabel) {
         tools.exit.failure(`"${conflictLabelName}" label not found in your repository!`);
     }
-    let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter((pullrequest) => {
+    let pullrequestsWithConflicts;
+    pullrequestsWithConflicts = result.repository.pullRequests.edges.filter((pullrequest) => {
         return pullrequest.node.mergeable === 'CONFLICTING';
     });
     if (pullrequestsWithConflicts.length > 0) {

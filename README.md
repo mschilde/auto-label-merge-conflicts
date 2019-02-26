@@ -22,7 +22,7 @@ action "Auto label merge conflicts" {
 
 Please note the parameter `CONFLICT_LABEL_NAME`. This should be set to the name of the label you want to apply to PRs with merge conflicts.
 
-This label **has to exist** or the action will **fail**. Just create the label manually.
+This label **has to exist** on your repo or the action will **fail**. Just create the label manually.
 
 ## What does this action do?
 

@@ -34,7 +34,8 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     );
   }
 
-  let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter(
+  let pullrequestsWithConflicts: GithubPRNode[];
+  pullrequestsWithConflicts= result.repository.pullRequests.edges.filter(
     (pullrequest: GithubPRNode) => {
       return pullrequest.node.mergeable === 'CONFLICTING';
     }
