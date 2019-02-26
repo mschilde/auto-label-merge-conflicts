@@ -14,6 +14,8 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     tools.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
   }
 
+  console.log(tools.context.payload);
+
   // only run on actual merges
   if (!tools.context.payload.merged) {
     tools.exit.neutral('PR was closed but not merged')
