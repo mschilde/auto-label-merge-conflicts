@@ -27,6 +27,8 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     tools.exit.failure('getPullRequestsAndLabels request failed');
   }
 
+  console.log(result.repository.pullRequests.edges);
+
   let conflictLabel = result.repository.labels.edges.find(
     (label: GithubLabelNode) => {
       return label.node.name === conflictLabelName;
