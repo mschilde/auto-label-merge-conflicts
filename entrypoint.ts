@@ -57,6 +57,28 @@ export const getPullRequests = (
   });
 };
 
+export const addLabelsToLabelable = (
+  tools: Toolkit,
+  {
+    labelIds,
+    labelableId,
+  }: {
+    labelIds: string;
+    labelableId: string;
+  },
+) => {
+  const query = `
+    mutation {
+      addLabelsToLabelable(input: {labelIds: ${labelIds}, labelableId: "${labelableId}"}) {
+        clientMutationId
+      }
+    }`;
+
+  return tools.github.graphql(query, {
+    headers: { Accept: 'application/vnd.github.starfire-preview+json' },
+  });
+};
+
 (async () => {
   // check configuration
   if (!process.env['CONFLICT_LABEL']) {
@@ -89,8 +111,21 @@ export const getPullRequests = (
   });
 
   if (pullrequestsWithConflicts.length > 0) {
-    pullrequestsWithConflicts.forEach((pullrequest: GithubPRNode) => {
+    pullrequestsWithConflicts.forEach(async (pullrequest: GithubPRNode) => {
       console.log(pullrequest.node.id);
+
+
+      try {
+        await addLabelsToLabelable(tools, {
+          labelIds: conflictLabel.node.id,
+          labelableId: pullrequest.node.id,
+        });
+      } catch (error) {
+        console.error('Request failed: ', error.request, error.message);
+        tools.exit.failure('addLabelsToLabelable has failed. ');
+      }
+
+
     })
   } else {
     tools.exit.success('No PR has conflicts, congrats!')
