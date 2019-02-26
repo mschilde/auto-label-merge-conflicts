@@ -16,10 +16,13 @@ interface GithubPRNode {
     id: string;
     number: string;
     mergeable: string;
+    labels: {
+      edges: [GithubLabelNode]
+    }
   }
 }
 
-const getPullRequests = (
+const getPullRequestsAndLabels = (
   tools: Toolkit,
   {
     owner,
@@ -37,6 +40,14 @@ const getPullRequests = (
             id
             number
             mergeable
+            labels(first:100) {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }
@@ -87,9 +98,9 @@ const addLabelsToLabelable = (
   let result;
 
   try {
-    result = await getPullRequests(tools, tools.context.repo());
+    result = await getPullRequestsAndLabels(tools, tools.context.repo());
   } catch (error) {
-    tools.exit.failure('getPullRequests has failed.');
+    tools.exit.failure('getPullRequestsAndLabels request failed');
   }
 
   let conflictLabel = result.repository.labels.edges.find((label: GithubLabelNode) => {
@@ -106,14 +117,22 @@ const addLabelsToLabelable = (
 
   if (pullrequestsWithConflicts.length > 0) {
     pullrequestsWithConflicts.forEach(async (pullrequest: GithubPRNode) => {
-      tools.log.info(`Labeling PR #${pullrequest.node.number}`);
-      try {
-        await addLabelsToLabelable(tools, {
-          labelIds: conflictLabel.node.id,
-          labelableId: pullrequest.node.id,
-        });
-      } catch (error) {
-        tools.exit.failure('addLabelsToLabelable has failed');
+      const isAlreadyLabeled = pullrequest.node.labels.edges.find((label: GithubLabelNode) => {
+        return (label.node.id === conflictLabel.node.id);
+      });
+
+      if (isAlreadyLabeled) {
+        tools.log.info(`Skipping PR #${pullrequest.node.number}, it's already labeled`);
+      } else {
+        tools.log.info(`Labeling PR #${pullrequest.node.number}`);
+        try {
+          await addLabelsToLabelable(tools, {
+            labelIds: conflictLabel.node.id,
+            labelableId: pullrequest.node.id,
+          });
+        } catch (error) {
+          tools.exit.failure('addLabelsToLabelable request failed');
+        }
       }
     })
   } else {

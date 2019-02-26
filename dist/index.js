@@ -4,7 +4,7 @@ const actions_toolkit_1 = require("actions-toolkit");
 const tools = new actions_toolkit_1.Toolkit({
     event: ['pull_request.opened', 'pull_request.synchronize']
 });
-const getPullRequests = (tools, { owner, repo }) => {
+const getPullRequestsAndLabels = (tools, { owner, repo }) => {
     const query = `{
     repository(owner: "${owner}", name: "${repo}") {
       pullRequests(last: 50, states:OPEN) {
@@ -13,6 +13,14 @@ const getPullRequests = (tools, { owner, repo }) => {
             id
             number
             mergeable
+            labels(first:100) {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }
@@ -48,10 +56,10 @@ const addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
     }
     let result;
     try {
-        result = await getPullRequests(tools, tools.context.repo());
+        result = await getPullRequestsAndLabels(tools, tools.context.repo());
     }
     catch (error) {
-        tools.exit.failure('getPullRequests has failed.');
+        tools.exit.failure('getPullRequestsAndLabels request failed');
     }
     let conflictLabel = result.repository.labels.edges.find((label) => {
         return (label.node.name === process.env['CONFLICT_LABEL_NAME']);
@@ -64,15 +72,23 @@ const addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
     });
     if (pullrequestsWithConflicts.length > 0) {
         pullrequestsWithConflicts.forEach(async (pullrequest) => {
-            tools.log.info(`Labeling PR #${pullrequest.node.number}`);
-            try {
-                await addLabelsToLabelable(tools, {
-                    labelIds: conflictLabel.node.id,
-                    labelableId: pullrequest.node.id,
-                });
+            const isAlreadyLabeled = pullrequest.node.labels.edges.find((label) => {
+                return (label.node.id === conflictLabel.node.id);
+            });
+            if (isAlreadyLabeled) {
+                tools.log.info(`Skipping PR #${pullrequest.node.number}, it's already labeled`);
             }
-            catch (error) {
-                tools.exit.failure('addLabelsToLabelable has failed');
+            else {
+                tools.log.info(`Labeling PR #${pullrequest.node.number}`);
+                try {
+                    await addLabelsToLabelable(tools, {
+                        labelIds: conflictLabel.node.id,
+                        labelableId: pullrequest.node.id,
+                    });
+                }
+                catch (error) {
+                    tools.exit.failure('addLabelsToLabelable request failed');
+                }
             }
         });
     }
