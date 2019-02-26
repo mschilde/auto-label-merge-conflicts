@@ -54,4 +54,5 @@ export const getPullRequests = (
 
   console.log('Result: ', result);
   console.log(result.repository.pullRequests.edges);
+  console.log(result.repository.labels.edges);
 })();

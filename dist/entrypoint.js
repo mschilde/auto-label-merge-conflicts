@@ -40,4 +40,6 @@ exports.getPullRequests = (tools, { owner, repo }) => {
         tools.exit.failure('getPullRequests has failed.');
     }
     console.log('Result: ', result);
+    console.log(result.repository.pullRequests.edges);
+    console.log(result.repository.labels.edges);
 })();
