@@ -3,7 +3,7 @@ import { GithubLabelNode, GithubPRNode } from './lib/interfaces';
 import { addLabelsToLabelable, getPullRequestsAndLabels } from './lib/queries';
 
 const tools = new Toolkit({
-  event: ['pull_request.opened', 'pull_request.synchronize']
+  event: ['pull_request.closed']
 });
 
 const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
@@ -12,6 +12,11 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
   // check configuration
   if (!conflictLabelName) {
     tools.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
+  }
+
+  // only run on actual merges
+  if (!tools.context.payload.merged) {
+    tools.exit.neutral('PR was closed but not merged')
   }
 
   let result;
