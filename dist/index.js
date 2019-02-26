@@ -3,13 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const actions_toolkit_1 = require("actions-toolkit");
 const queries_1 = require("./lib/queries");
 const tools = new actions_toolkit_1.Toolkit({
-    event: ['pull_request.opened', 'pull_request.synchronize']
+    event: ['pull_request.closed']
 });
 const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
 (async () => {
     // check configuration
     if (!conflictLabelName) {
         tools.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
+    }
+    // only run on actual merges
+    if (!tools.context.payload.merged) {
+        tools.exit.neutral('PR was closed but not merged');
     }
     let result;
     try {
