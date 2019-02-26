@@ -1,5 +1,4 @@
 import { Toolkit } from 'actions-toolkit';
-import * as _ from 'lodash';
 
 const tools = new Toolkit({
   event: ['pull_request.opened', 'pull_request.synchronize']
@@ -90,13 +89,8 @@ export const addLabelsToLabelable = (
   try {
     result = await getPullRequests(tools, tools.context.repo());
   } catch (error) {
-    console.error('Request failed: ', error.request, error.message);
     tools.exit.failure('getPullRequests has failed.');
   }
-
-  console.log('Result: ', result);
-  console.log(result.repository.pullRequests.edges);
-  console.log(result.repository.labels.edges);
 
   let conflictLabel = result.repository.labels.edges.find((label: GithubLabelNode) => {
     return (label.node.name === process.env['CONFLICT_LABEL']);
@@ -112,20 +106,14 @@ export const addLabelsToLabelable = (
 
   if (pullrequestsWithConflicts.length > 0) {
     pullrequestsWithConflicts.forEach(async (pullrequest: GithubPRNode) => {
-      console.log(pullrequest.node.id);
-
-
       try {
         await addLabelsToLabelable(tools, {
           labelIds: conflictLabel.node.id,
           labelableId: pullrequest.node.id,
         });
       } catch (error) {
-        console.error('Request failed: ', error.request, error.message);
         tools.exit.failure('addLabelsToLabelable has failed. ');
       }
-
-
     })
   } else {
     tools.exit.success('No PR has conflicts, congrats!')

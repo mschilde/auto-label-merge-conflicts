@@ -51,12 +51,8 @@ exports.addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
         result = await exports.getPullRequests(tools, tools.context.repo());
     }
     catch (error) {
-        console.error('Request failed: ', error.request, error.message);
         tools.exit.failure('getPullRequests has failed.');
     }
-    console.log('Result: ', result);
-    console.log(result.repository.pullRequests.edges);
-    console.log(result.repository.labels.edges);
     let conflictLabel = result.repository.labels.edges.find((label) => {
         return (label.node.name === process.env['CONFLICT_LABEL']);
     });
@@ -68,7 +64,6 @@ exports.addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
     });
     if (pullrequestsWithConflicts.length > 0) {
         pullrequestsWithConflicts.forEach(async (pullrequest) => {
-            console.log(pullrequest.node.id);
             try {
                 await exports.addLabelsToLabelable(tools, {
                     labelIds: conflictLabel.node.id,
@@ -76,7 +71,6 @@ exports.addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
                 });
             }
             catch (error) {
-                console.error('Request failed: ', error.request, error.message);
                 tools.exit.failure('addLabelsToLabelable has failed. ');
             }
         });
