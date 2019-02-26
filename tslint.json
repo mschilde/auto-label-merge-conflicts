@@ -13,7 +13,8 @@
     "no-this-assignment": true,
     "no-unused-expression": true,
     "no-use-before-declare": false,
-    "no-var-keyword": true
-  },
-  "no-parameter-reassignment": true
+    "no-var-keyword": true,
+    "no-parameter-reassignment": true,
+    "triple-equals": [true, "allow-null-check"]
+  }
 }

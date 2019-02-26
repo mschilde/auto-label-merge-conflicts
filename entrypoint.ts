@@ -5,6 +5,11 @@ const tools = new Toolkit({
   event: ['pull_request.opened', 'pull_request.synchronize']
 });
 
+interface GithubLabel {
+  id: string;
+  name: string;
+}
+
 export const getPullRequests = (
   tools: Toolkit,
   {
@@ -43,6 +48,11 @@ export const getPullRequests = (
 };
 
 (async () => {
+  // check configuration
+  if (!process.env['CONFLICT_LABEL']) {
+    tools.exit.failure('Please set environment variable CONFLICT_LABEL');
+  }
+
   let result;
 
   try {
@@ -56,5 +66,14 @@ export const getPullRequests = (
   console.log(result.repository.pullRequests.edges);
   console.log(result.repository.labels.edges);
 
-  console.log(process.env['CONFLICT_LABEL']);
+  let conflictLabel = result.repository.labels.edges.find((label: GithubLabel) => {
+    return (label.name === process.env['CONFLICT_LABEL']);
+  });
+
+  console.log(conflictLabel);
+
+  if (!conflictLabel) {
+    tools.exit.failure(`${process.env['CONFLICT_LABEL']} not found in your repository`);
+  }
+
 })();

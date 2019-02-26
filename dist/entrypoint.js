@@ -31,6 +31,10 @@ exports.getPullRequests = (tools, { owner, repo }) => {
     });
 };
 (async () => {
+    // check configuration
+    if (!process.env['CONFLICT_LABEL']) {
+        tools.exit.failure('Please set environment variable CONFLICT_LABEL');
+    }
     let result;
     try {
         result = await exports.getPullRequests(tools, tools.context.repo());
@@ -42,5 +46,11 @@ exports.getPullRequests = (tools, { owner, repo }) => {
     console.log('Result: ', result);
     console.log(result.repository.pullRequests.edges);
     console.log(result.repository.labels.edges);
-    console.log(process.env['CONFLICT_LABEL']);
+    let conflictLabel = result.repository.labels.edges.find((label) => {
+        return (label.name === process.env['CONFLICT_LABEL']);
+    });
+    console.log(conflictLabel);
+    if (!conflictLabel) {
+        tools.exit.failure(`${process.env['CONFLICT_LABEL']} not found in your repository`);
+    }
 })();
