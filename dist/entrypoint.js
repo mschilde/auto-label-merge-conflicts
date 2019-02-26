@@ -30,6 +30,17 @@ exports.getPullRequests = (tools, { owner, repo }) => {
         headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
     });
 };
+exports.addLabelsToLabelable = (tools, { labelIds, labelableId, }) => {
+    const query = `
+    mutation {
+      addLabelsToLabelable(input: {labelIds: ${labelIds}, labelableId: "${labelableId}"}) {
+        clientMutationId
+      }
+    }`;
+    return tools.github.graphql(query, {
+        headers: { Accept: 'application/vnd.github.starfire-preview+json' },
+    });
+};
 (async () => {
     // check configuration
     if (!process.env['CONFLICT_LABEL']) {
@@ -56,8 +67,18 @@ exports.getPullRequests = (tools, { owner, repo }) => {
         return (pullrequest.node.mergeable === 'CONFLICTING');
     });
     if (pullrequestsWithConflicts.length > 0) {
-        pullrequestsWithConflicts.forEach((pullrequest) => {
+        pullrequestsWithConflicts.forEach(async (pullrequest) => {
             console.log(pullrequest.node.id);
+            try {
+                await exports.addLabelsToLabelable(tools, {
+                    labelIds: conflictLabel.node.id,
+                    labelableId: pullrequest.node.id,
+                });
+            }
+            catch (error) {
+                console.error('Request failed: ', error.request, error.message);
+                tools.exit.failure('addLabelsToLabelable has failed. ');
+            }
         });
     }
     else {
