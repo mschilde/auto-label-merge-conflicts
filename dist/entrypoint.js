@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const actions_toolkit_1 = require("actions-toolkit");
 const tools = new actions_toolkit_1.Toolkit({
-    event: ['pull_request.opened', 'pull_request.synchronize'],
+    event: ['pull_request.opened', 'pull_request.synchronize']
 });
-exports.getPullRequests = (tools, { owner, repo, }) => {
+exports.getPullRequests = (tools, { owner, repo }) => {
     const query = `{
     repository(owner: "${owner}", name: "${repo}") {
       pullRequests(last: 50, states:OPEN) {
@@ -27,7 +27,7 @@ exports.getPullRequests = (tools, { owner, repo, }) => {
     }
   }`;
     return tools.github.graphql(query, {
-        headers: { Accept: 'application/vnd.github.ocelot-preview+json' },
+        headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
     });
 };
 (async () => {
