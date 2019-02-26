@@ -1,97 +1,16 @@
 import { Toolkit } from 'actions-toolkit';
+import { GithubLabelNode, GithubPRNode } from './lib/interfaces';
+import { addLabelsToLabelable, getPullRequestsAndLabels } from './lib/queries';
 
 const tools = new Toolkit({
   event: ['pull_request.opened', 'pull_request.synchronize']
 });
 
-interface GithubLabelNode {
-  node: {
-    id: string;
-    name: string;
-  }
-}
-
-interface GithubPRNode {
-  node: {
-    id: string;
-    number: string;
-    mergeable: string;
-    labels: {
-      edges: [GithubLabelNode]
-    }
-  }
-}
-
-const getPullRequestsAndLabels = (
-  tools: Toolkit,
-  {
-    owner,
-    repo
-  }: {
-    owner: string;
-    repo: string;
-  }
-) => {
-  const query = `{
-    repository(owner: "${owner}", name: "${repo}") {
-      pullRequests(last: 50, states:OPEN) {
-        edges {
-          node {
-            id
-            number
-            mergeable
-            labels(first:100) {
-              edges {
-                node {
-                  id
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
-      labels(first: 100) {
-        edges {
-          node {
-            id
-            name
-          }
-        }
-      }
-    }
-  }`;
-
-  return tools.github.graphql(query, {
-    headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
-  });
-};
-
-const addLabelsToLabelable = (
-  tools: Toolkit,
-  {
-    labelIds,
-    labelableId,
-  }: {
-    labelIds: string;
-    labelableId: string;
-  },
-) => {
-  const query = `
-    mutation {
-      addLabelsToLabelable(input: {labelIds: ${labelIds}, labelableId: "${labelableId}"}) {
-        clientMutationId
-      }
-    }`;
-
-  return tools.github.graphql(query, {
-    headers: { Accept: 'application/vnd.github.starfire-preview+json' },
-  });
-};
+const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
 
 (async () => {
   // check configuration
-  if (!process.env['CONFLICT_LABEL_NAME']) {
+  if (!conflictLabelName) {
     tools.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
   }
 
@@ -103,41 +22,50 @@ const addLabelsToLabelable = (
     tools.exit.failure('getPullRequestsAndLabels request failed');
   }
 
-  let conflictLabel = result.repository.labels.edges.find((label: GithubLabelNode) => {
-    return (label.node.name === process.env['CONFLICT_LABEL_NAME']);
-  });
+  let conflictLabel = result.repository.labels.edges.find(
+    (label: GithubLabelNode) => {
+      return label.node.name === conflictLabelName;
+    }
+  );
 
   if (!conflictLabel) {
-    tools.exit.failure(`"${process.env['CONFLICT_LABEL_NAME']}" label not found in your repository!`);
+    tools.exit.failure(
+      `"${conflictLabelName}" label not found in your repository!`
+    );
   }
 
-  let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter((pullrequest: GithubPRNode) => {
-    return (pullrequest.node.mergeable === 'CONFLICTING');
-  });
+  let pullrequestsWithConflicts = result.repository.pullRequests.edges.filter(
+    (pullrequest: GithubPRNode) => {
+      return pullrequest.node.mergeable === 'CONFLICTING';
+    }
+  );
 
   if (pullrequestsWithConflicts.length > 0) {
     pullrequestsWithConflicts.forEach(async (pullrequest: GithubPRNode) => {
-      const isAlreadyLabeled = pullrequest.node.labels.edges.find((label: GithubLabelNode) => {
-        return (label.node.id === conflictLabel.node.id);
-      });
+      const isAlreadyLabeled = pullrequest.node.labels.edges.find(
+        (label: GithubLabelNode) => {
+          return label.node.id === conflictLabel.node.id;
+        }
+      );
 
       if (isAlreadyLabeled) {
-        tools.log.info(`Skipping PR #${pullrequest.node.number}, it's already labeled`);
+        tools.log.info(
+          `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
+        );
       } else {
         tools.log.info(`Labeling PR #${pullrequest.node.number}`);
         try {
           await addLabelsToLabelable(tools, {
             labelIds: conflictLabel.node.id,
-            labelableId: pullrequest.node.id,
+            labelableId: pullrequest.node.id
           });
         } catch (error) {
           tools.exit.failure('addLabelsToLabelable request failed');
         }
       }
-    })
+    });
   } else {
     // nothing to do
-    tools.exit.success('No PR has conflicts, congrats!')
+    tools.exit.success('No PR has conflicts, congrats!');
   }
-
 })();
