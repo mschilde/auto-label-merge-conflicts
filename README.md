@@ -30,8 +30,14 @@ The idea is that after a PR is merged all other open Pull Requests are checked. 
 
 We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
 
+## Limitations
+
+I didn't bother yet with pagination handling. 
+
+This action checks the latest 50 open PRs and deals with up to 100 labels. See [queries.ts](lib/queries.ts) Feel free to fix and submit a PR :-)
+
 ## Local dev setup
 
-Feel free to extend the code. To play around with the code base, you need `Docker` and `make` set up locally.
+To play around with the code base, you need `Docker` and `make` set up locally.
 
 Run `make build`, `make develop`, then `yarn install`.
