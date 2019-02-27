@@ -1,6 +1,7 @@
 import { Toolkit } from 'actions-toolkit';
 import { GithubLabelNode, GithubPRNode } from './lib/interfaces';
 import { addLabelsToLabelable, getPullRequestsAndLabels } from './lib/queries';
+import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
 const tools = new Toolkit({
   event: ['pull_request.closed']
@@ -15,8 +16,11 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
   }
 
   // only run on actual merges
-  if (tools.context.payload.pull_request && !tools.context.payload.pull_request.merged) {
-    tools.exit.neutral('PR was closed but not merged')
+  if (
+    tools.context.payload.pull_request &&
+    !tools.context.payload.pull_request.merged
+  ) {
+    tools.exit.neutral('PR was closed but not merged');
   }
 
   let result;
@@ -26,8 +30,6 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
   } catch (error) {
     tools.exit.failure('getPullRequestsAndLabels request failed');
   }
-
-  console.log(result.repository.pullRequests.edges);
 
   let conflictLabel = result.repository.labels.edges.find(
     (label: GithubLabelNode) => {
@@ -41,8 +43,31 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     );
   }
 
+  // check if there are PRs with unknown mergeable status
+  let pullrequestsWithoutMergeStatus: GithubPRNode[];
+  pullrequestsWithoutMergeStatus = getPullrequestsWithoutMergeStatus(
+    result.repository.pullRequests.edges
+  );
+
+  // wait and retry
+  if (pullrequestsWithoutMergeStatus.length > 0) {
+    await wait(5000);
+    try {
+      result = await getPullRequestsAndLabels(tools, tools.context.repo());
+    } catch (error) {
+      tools.exit.failure('getPullRequestsAndLabels request failed');
+    }
+  }
+
+  pullrequestsWithoutMergeStatus = getPullrequestsWithoutMergeStatus(
+    result.repository.pullRequests.edges
+  );
+  if (pullrequestsWithoutMergeStatus.length > 0) {
+    tools.exit.failure('Cannot determine mergeable status!');
+  }
+
   let pullrequestsWithConflicts: GithubPRNode[];
-  pullrequestsWithConflicts= result.repository.pullRequests.edges.filter(
+  pullrequestsWithConflicts = result.repository.pullRequests.edges.filter(
     (pullrequest: GithubPRNode) => {
       return pullrequest.node.mergeable === 'CONFLICTING';
     }
@@ -58,7 +83,9 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
 
       if (isAlreadyLabeled) {
         tools.log.info(
-          `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
+          `Skipping PR #${
+            pullrequest.node.number
+          }, it has conflicts but is already labeled`
         );
       } else {
         tools.log.info(`Labeling PR #${pullrequest.node.number}`);
