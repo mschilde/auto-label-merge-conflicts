@@ -51,6 +51,7 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
 
   // wait and retry
   if (pullrequestsWithoutMergeStatus.length > 0) {
+    tools.log.info(`...waiting for mergeable info...`);
     await wait(5000);
     try {
       result = await getPullRequestsAndLabels(tools, tools.context.repo());
