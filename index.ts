@@ -1,6 +1,10 @@
 import { Toolkit } from 'actions-toolkit';
 import { GithubLabelNode, GithubPRNode } from './lib/interfaces';
-import { addLabelsToLabelable, getPullRequestsAndLabels } from './lib/queries';
+import {
+  addLabelsToLabelable,
+  getLabels,
+  getPullRequests
+} from './lib/queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
 const tools = new Toolkit({
@@ -8,6 +12,8 @@ const tools = new Toolkit({
 });
 
 const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
+const maxRetries = 3;
+const waitMs = 5000;
 
 (async () => {
   // check configuration
@@ -23,15 +29,15 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     tools.exit.neutral('PR was closed but not merged');
   }
 
-  let result;
-
+  let labelData;
   try {
-    result = await getPullRequestsAndLabels(tools, tools.context.repo());
+    labelData = await getLabels(tools, tools.context.repo());
   } catch (error) {
-    tools.exit.failure('getPullRequestsAndLabels request failed');
+    tools.exit.failure('getLabels request failed');
   }
 
-  let conflictLabel = result.repository.labels.edges.find(
+  // fetch label data
+  let conflictLabel = labelData.repository.labels.edges.find(
     (label: GithubLabelNode) => {
       return label.node.name === conflictLabelName;
     }
@@ -43,37 +49,49 @@ const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
     );
   }
 
-  // check if there are PRs with unknown mergeable status
-  let pullrequestsWithoutMergeStatus: GithubPRNode[];
-  pullrequestsWithoutMergeStatus = getPullrequestsWithoutMergeStatus(
-    result.repository.pullRequests.edges
-  );
+  let pullrequestData;
 
-  // wait and retry
-  if (pullrequestsWithoutMergeStatus.length > 0) {
-    tools.log.info(`...waiting for mergeable info...`);
-    await wait(5000);
-    try {
-      result = await getPullRequestsAndLabels(tools, tools.context.repo());
-    } catch (error) {
-      tools.exit.failure('getPullRequestsAndLabels request failed');
+  // fetch PRs up to $maxRetries times
+  // multiple fetches are necessary because Github computes the 'mergeable' status asynchronously, on request,
+  // which might not be available directly after the merge
+  let pullrequestsWithoutMergeStatus: GithubPRNode[] = [];
+  let tries = 0;
+  while (
+    (pullrequestsWithoutMergeStatus.length > 0 && tries < maxRetries) ||
+    tries === 0
+  ) {
+    tries++;
+    // wait a bit
+    if (pullrequestsWithoutMergeStatus.length > 0) {
+      tools.log.info(`...waiting for mergeable info...`);
+      await wait(waitMs);
     }
+
+    try {
+      pullrequestData = await getPullRequests(tools, tools.context.repo());
+    } catch (error) {
+      tools.exit.failure('getPullRequests request failed');
+    }
+
+    // check if there are PRs with unknown mergeable status
+    pullrequestsWithoutMergeStatus = getPullrequestsWithoutMergeStatus(
+      pullrequestData.repository.pullRequests.edges
+    );
   }
 
-  pullrequestsWithoutMergeStatus = getPullrequestsWithoutMergeStatus(
-    result.repository.pullRequests.edges
-  );
+  // after $maxRetries we give up, probably Github has some issues
   if (pullrequestsWithoutMergeStatus.length > 0) {
     tools.exit.failure('Cannot determine mergeable status!');
   }
 
   let pullrequestsWithConflicts: GithubPRNode[];
-  pullrequestsWithConflicts = result.repository.pullRequests.edges.filter(
+  pullrequestsWithConflicts = pullrequestData.repository.pullRequests.edges.filter(
     (pullrequest: GithubPRNode) => {
       return pullrequest.node.mergeable === 'CONFLICTING';
     }
   );
 
+  // label PRs with conflicts
   if (pullrequestsWithConflicts.length > 0) {
     pullrequestsWithConflicts.forEach(async (pullrequest: GithubPRNode) => {
       const isAlreadyLabeled = pullrequest.node.labels.edges.find(

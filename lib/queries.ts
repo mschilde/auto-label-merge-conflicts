@@ -1,6 +1,6 @@
 import { Toolkit } from 'actions-toolkit';
 
-export const getPullRequestsAndLabels = (
+export const getPullRequests = (
   tools: Toolkit,
   {
     owner,
@@ -29,6 +29,35 @@ export const getPullRequestsAndLabels = (
           }
         }
       }
+      labels(first: 100) {
+        edges {
+          node {
+            id
+            name
+          }
+        }
+      }
+    }
+  }`;
+
+  return tools.github.graphql(query, {
+    headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
+  });
+};
+
+
+export const getLabels = (
+  tools: Toolkit,
+  {
+    owner,
+    repo
+  }: {
+    owner: string;
+    repo: string;
+  }
+) => {
+  const query = `{
+    repository(owner: "${owner}", name: "${repo}") {
       labels(first: 100) {
         edges {
           node {
