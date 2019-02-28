@@ -36,9 +36,9 @@ We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo
 
 ## Pitfalls
 
-Since this action runs post merge on a PR context it is only working if you don't immediately click the `delete branch` option. (I know, muscle memory)
+Since this action runs post merge in a PR context it is only working if you don't immediately click the `delete branch` button after merging a PR. (I know, muscle memory)
 
-A good workaround is the [`branch cleanup`](jessfraz/branch-cleanup-action@master) action by @jessfraz
+A good workaround is the [`branch cleanup`](https://github.com/jessfraz/branch-cleanup-action) action by @jessfraz
 
 See also the [workflow file](/.github/main.workflow) of this repo for inspiration.
 
