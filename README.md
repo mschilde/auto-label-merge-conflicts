@@ -32,6 +32,8 @@ The idea is that after a PR is merged all other open Pull Requests are checked. 
 
 We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
 
+![Github action in action](./demo.png)
+
 ## Limitations
 
 I didn't bother yet with pagination handling. 

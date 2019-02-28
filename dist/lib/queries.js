@@ -20,14 +20,6 @@ exports.getPullRequests = (tools, { owner, repo }) => {
           }
         }
       }
-      labels(first: 100) {
-        edges {
-          node {
-            id
-            name
-          }
-        }
-      }
     }
   }`;
     return tools.github.graphql(query, {
