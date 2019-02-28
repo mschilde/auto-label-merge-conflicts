@@ -1,8 +1,5 @@
 FROM node:10.15.1
 
-COPY . .
-RUN yarn install
-
 ENV PATH="/home/autolabel/node_modules/.bin:${PATH}"
 
 WORKDIR /home/autolabel
