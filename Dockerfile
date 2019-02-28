@@ -6,8 +6,10 @@ LABEL "com.github.actions.icon"="alert-triangle"
 LABEL "com.github.actions.color"="orange"
 LABEL "maintainer"="Marko Schilde (@mschilde)"
 
-COPY package*.json yarn.lock ./
+WORKDIR /home/autolabel
+
+COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
 
-ENTRYPOINT ["node", "/dist/index.js"]
+ENTRYPOINT ["node", "/home/autolabel/dist/index.js"]
