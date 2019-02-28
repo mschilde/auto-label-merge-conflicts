@@ -34,6 +34,14 @@ We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo
 
 ![Github action in action](./demo.png)
 
+## Pitfalls
+
+Since this action runs post merge in a PR context it is only working if you don't immediately click the `delete branch` button after merging a PR. (I know, muscle memory)
+
+A good workaround is the [`branch cleanup`](https://github.com/jessfraz/branch-cleanup-action) action by @jessfraz
+
+See also the [workflow file](/.github/main.workflow) of this repo for inspiration.
+
 ## Limitations
 
 I didn't bother yet with pagination handling. 
