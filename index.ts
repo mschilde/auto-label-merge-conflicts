@@ -12,7 +12,7 @@ const tools = new Toolkit({
 });
 
 const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
-const maxRetries = 3;
+const maxRetries = 5;
 const waitMs = 5000;
 
 (async () => {
