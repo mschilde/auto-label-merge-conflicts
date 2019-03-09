@@ -7,7 +7,7 @@ const tools = new actions_toolkit_1.Toolkit({
     event: ['pull_request.closed']
 });
 const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
-const maxRetries = 3;
+const maxRetries = 5;
 const waitMs = 5000;
 (async () => {
     // check configuration
