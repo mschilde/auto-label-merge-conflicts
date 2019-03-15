@@ -3,9 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const actions_toolkit_1 = require("actions-toolkit");
 const queries_1 = require("./lib/queries");
 const util_1 = require("./lib/util");
-const toolkit = new actions_toolkit_1.Toolkit({
-    event: ['pull_request.closed']
-});
+const toolkit = new actions_toolkit_1.Toolkit();
 const conflictLabelName = process.env.CONFLICT_LABEL_NAME;
 const maxRetries = 5;
 const waitMs = 5000;

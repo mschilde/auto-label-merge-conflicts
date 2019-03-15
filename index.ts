@@ -7,9 +7,7 @@ import {
 } from './lib/queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
-const toolkit = new Toolkit({
-  event: ['pull_request.closed']
-});
+const toolkit = new Toolkit();
 
 const conflictLabelName = process.env.CONFLICT_LABEL_NAME!;
 const maxRetries = 5;
