@@ -70,7 +70,7 @@ export const getPullRequests = async (
   tools: Toolkit
 ): Promise<IGithubPRNode[]> => {
   let pullrequestData;
-  const pullrequests: IGithubPRNode[] = [];
+  let pullrequests: IGithubPRNode[] = [];
   let cursor;
   let hasNextPage = true;
 
@@ -82,9 +82,11 @@ export const getPullRequests = async (
       tools.exit.failure('getPullRequests request failed');
     }
 
-    console.log(pullrequestData.repository.pullRequests.edges)
+    console.log(pullrequestData.repository.pullRequests.edges);
 
-    pullrequests.push(pullrequestData.repository.pullRequests.edges);
+    pullrequests = pullrequests.concat(
+      pullrequestData.repository.pullRequests.edges
+    );
 
     cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
     hasNextPage = pullrequestData.repository.pullRequests.pageInfo.hasNextPage;

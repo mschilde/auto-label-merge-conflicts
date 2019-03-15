@@ -66,7 +66,7 @@ const getPullRequestPages = (tools, cursor) => {
 // fetch all PRs
 exports.getPullRequests = async (tools) => {
     let pullrequestData;
-    const pullrequests = [];
+    let pullrequests = [];
     let cursor;
     let hasNextPage = true;
     while (hasNextPage) {
@@ -78,7 +78,7 @@ exports.getPullRequests = async (tools) => {
             tools.exit.failure('getPullRequests request failed');
         }
         console.log(pullrequestData.repository.pullRequests.edges);
-        pullrequests.push(pullrequestData.repository.pullRequests.edges);
+        pullrequests = pullrequests.concat(pullrequestData.repository.pullRequests.edges);
         cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
         hasNextPage = pullrequestData.repository.pullRequests.pageInfo.hasNextPage;
     }
