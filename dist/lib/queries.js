@@ -6,13 +6,13 @@ const getPullRequestPages = (tools, cursor) => {
     if (cursor) {
         query = `{
       repository(owner: "${context.owner}", name: "${context.repo}") {
-        pullRequests(first: 2, states: OPEN, after: "${cursor}") {
+        pullRequests(first: 100, states: OPEN, after: "${cursor}") {
           edges {
             node {
               id
               number
               mergeable
-              labels(first:100) {
+              labels(first: 100) {
                 edges {
                   node {
                     id
@@ -34,13 +34,13 @@ const getPullRequestPages = (tools, cursor) => {
     else {
         query = `{
       repository(owner: "${context.owner}", name: "${context.repo}") {
-        pullRequests(first: 2, states: OPEN) {
+        pullRequests(first: 100, states: OPEN) {
           edges {
             node {
               id
               number
               mergeable
-              labels(first:100) {
+              labels(first: 100) {
                 edges {
                   node {
                     id
