@@ -76,13 +76,10 @@ export const getPullRequests = async (
 
   while (hasNextPage) {
     try {
-      console.log('requesting with cursor ' + cursor);
       pullrequestData = await getPullRequestPages(tools, cursor);
     } catch (error) {
       tools.exit.failure('getPullRequests request failed');
     }
-
-    console.log(pullrequestData.repository.pullRequests.edges);
 
     pullrequests = pullrequests.concat(
       pullrequestData.repository.pullRequests.edges
