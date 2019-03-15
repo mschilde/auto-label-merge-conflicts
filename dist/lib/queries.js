@@ -9,6 +9,14 @@ exports.getPullRequests = (tools, { owner, repo }) => {
             id
             number
             mergeable
+            labels(first:100) {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }

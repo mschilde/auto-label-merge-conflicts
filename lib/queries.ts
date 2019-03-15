@@ -18,6 +18,14 @@ export const getPullRequests = (
             id
             number
             mergeable
+            labels(first:100) {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }
