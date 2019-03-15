@@ -37,7 +37,7 @@ const waitMs = 5000;
   }
 
   // fetch label data
-  // note we have to iterate over the labels despite the query since query match is quite fuzzy
+  // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
   const conflictLabel = labelData.repository.labels.edges.find(
     (label: GithubLabelNode) => {
       return label.node.name === conflictLabelName;

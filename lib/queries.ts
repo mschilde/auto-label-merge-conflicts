@@ -12,7 +12,7 @@ export const getPullRequests = (
 ) => {
   const query = `{
     repository(owner: "${owner}", name: "${repo}") {
-      pullRequests(last: 50, states: OPEN) {
+      pullRequests(first: 50, states: OPEN) {
         edges {
           node {
             id
@@ -27,6 +27,11 @@ export const getPullRequests = (
               }
             }
           }
+          cursor
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
         }
       }
     }
