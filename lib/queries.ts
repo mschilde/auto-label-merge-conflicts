@@ -66,7 +66,9 @@ const getPullRequestPages = (tools: Toolkit, cursor?: string) => {
 };
 
 // fetch all PRs
-export const getPullRequests = async (tools: Toolkit): Promise<IGithubPRNode[]> => {
+export const getPullRequests = async (
+  tools: Toolkit
+): Promise<IGithubPRNode[]> => {
   let pullrequestData;
   const pullrequests: IGithubPRNode[] = [];
   let cursor;
@@ -74,6 +76,7 @@ export const getPullRequests = async (tools: Toolkit): Promise<IGithubPRNode[]> 
 
   while (hasNextPage) {
     try {
+      console.log('requesting with cursor ' + cursor);
       pullrequestData = await getPullRequestPages(tools, cursor);
     } catch (error) {
       tools.exit.failure('getPullRequests request failed');

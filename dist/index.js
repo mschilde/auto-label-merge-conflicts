@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const actions_toolkit_1 = require("actions-toolkit");
 const queries_1 = require("./lib/queries");
 const util_1 = require("./lib/util");
-const tools = new actions_toolkit_1.Toolkit({
+const toolkit = new actions_toolkit_1.Toolkit({
     event: ['pull_request.closed']
 });
 const conflictLabelName = process.env.CONFLICT_LABEL_NAME;
@@ -12,29 +12,29 @@ const waitMs = 5000;
 (async () => {
     // check configuration
     if (!conflictLabelName) {
-        tools.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
+        toolkit.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
     }
     // only run on actual merges
-    if (tools.context.payload.pull_request &&
-        !tools.context.payload.pull_request.merged) {
-        tools.exit.neutral('PR was closed but not merged');
-    }
-    let labelData;
-    try {
-        labelData = await queries_1.getLabels(tools, tools.context.repo(), conflictLabelName);
-    }
-    catch (error) {
-        tools.exit.failure('getLabels request failed');
+    if (toolkit.context.payload.pull_request &&
+        !toolkit.context.payload.pull_request.merged) {
+        toolkit.exit.neutral('PR was closed but not merged');
     }
     // fetch label data
-    // note we have to iterate over the labels despite the query since query match is quite fuzzy
+    let labelData;
+    try {
+        labelData = await queries_1.getLabels(toolkit, conflictLabelName);
+    }
+    catch (error) {
+        toolkit.exit.failure('getLabels request failed');
+    }
+    // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
     const conflictLabel = labelData.repository.labels.edges.find((label) => {
         return label.node.name === conflictLabelName;
     });
     if (!conflictLabel) {
-        tools.exit.failure(`"${conflictLabelName}" label not found in your repository!`);
+        toolkit.exit.failure(`"${conflictLabelName}" label not found in your repository!`);
     }
-    let pullrequestData;
+    let pullRequests;
     // fetch PRs up to $maxRetries times
     // multiple fetches are necessary because Github computes the 'mergeable' status asynchronously, on request,
     // which might not be available directly after the merge
@@ -43,26 +43,26 @@ const waitMs = 5000;
     while ((pullrequestsWithoutMergeStatus.length > 0 && tries < maxRetries) ||
         tries === 0) {
         tries++;
-        // wait a bit
+        // if merge status is unknown for any PR, wait a bit and retry
         if (pullrequestsWithoutMergeStatus.length > 0) {
-            tools.log.info(`...waiting for mergeable info...`);
+            toolkit.log.info(`...waiting for mergeable info...`);
             await util_1.wait(waitMs);
         }
         try {
-            pullrequestData = await queries_1.getPullRequests(tools, tools.context.repo());
+            pullRequests = await queries_1.getPullRequests(toolkit);
         }
         catch (error) {
-            tools.exit.failure('getPullRequests request failed');
+            toolkit.exit.failure('getPullRequests request failed');
         }
         // check if there are PRs with unknown mergeable status
-        pullrequestsWithoutMergeStatus = util_1.getPullrequestsWithoutMergeStatus(pullrequestData.repository.pullRequests.edges);
+        pullrequestsWithoutMergeStatus = util_1.getPullrequestsWithoutMergeStatus(pullRequests);
     }
     // after $maxRetries we give up, probably Github has some issues
     if (pullrequestsWithoutMergeStatus.length > 0) {
-        tools.exit.failure('Cannot determine mergeable status!');
+        toolkit.exit.failure('Cannot determine mergeable status!');
     }
     let pullrequestsWithConflicts;
-    pullrequestsWithConflicts = pullrequestData.repository.pullRequests.edges.filter((pullrequest) => {
+    pullrequestsWithConflicts = pullRequests.filter((pullrequest) => {
         return pullrequest.node.mergeable === 'CONFLICTING';
     });
     // label PRs with conflicts
@@ -72,24 +72,24 @@ const waitMs = 5000;
                 return label.node.id === conflictLabel.node.id;
             });
             if (isAlreadyLabeled) {
-                tools.log.info(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
+                toolkit.log.info(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
             }
             else {
-                tools.log.info(`Labeling PR #${pullrequest.node.number}`);
+                toolkit.log.info(`Labeling PR #${pullrequest.node.number}`);
                 try {
-                    await queries_1.addLabelsToLabelable(tools, {
+                    await queries_1.addLabelsToLabelable(toolkit, {
                         labelIds: conflictLabel.node.id,
                         labelableId: pullrequest.node.id
                     });
                 }
                 catch (error) {
-                    tools.exit.failure('addLabelsToLabelable request failed');
+                    toolkit.exit.failure('addLabelsToLabelable request failed');
                 }
             }
         });
     }
     else {
         // nothing to do
-        tools.exit.success('No PR has conflicts, congrats!');
+        toolkit.exit.success('No PR has conflicts, congrats!');
     }
 })();
