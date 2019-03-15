@@ -82,6 +82,8 @@ export const getPullRequests = async (
       tools.exit.failure('getPullRequests request failed');
     }
 
+    console.log(pullrequestData.repository.pullRequests.edges)
+
     pullrequests.push(pullrequestData.repository.pullRequests.edges);
 
     cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
