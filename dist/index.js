@@ -16,7 +16,8 @@ const waitMs = 5000;
     }
     // only run on actual merges
     if (toolkit.context.payload.pull_request &&
-        !toolkit.context.payload.pull_request.merged) {
+        !toolkit.context.payload.pull_request.merged &&
+        false) {
         toolkit.exit.neutral('PR was closed but not merged');
     }
     // fetch label data
@@ -54,6 +55,7 @@ const waitMs = 5000;
         catch (error) {
             toolkit.exit.failure('getPullRequests request failed');
         }
+        console.log(pullRequests);
         // check if there are PRs with unknown mergeable status
         pullrequestsWithoutMergeStatus = util_1.getPullrequestsWithoutMergeStatus(pullRequests);
     }
