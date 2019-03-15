@@ -46,11 +46,12 @@ export const getLabels = (
   }: {
     owner: string;
     repo: string;
-  }
+  },
+  labelName: string
 ) => {
   const query = `{
     repository(owner: "${owner}", name: "${repo}") {
-      labels(first: 100) {
+      labels(first: 100, query: "${labelName}") {
         edges {
           node {
             id
