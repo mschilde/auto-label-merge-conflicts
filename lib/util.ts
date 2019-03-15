@@ -1,4 +1,4 @@
-import { GithubPRNode } from './interfaces';
+import { IGithubPRNode } from './interfaces';
 
 export async function wait(ms: number) {
   return new Promise((resolve) => {
@@ -7,9 +7,9 @@ export async function wait(ms: number) {
 }
 
 export function getPullrequestsWithoutMergeStatus(
-  pullrequests: GithubPRNode[]
-): GithubPRNode[] {
-  return pullrequests.filter((pullrequest: GithubPRNode) => {
+  pullrequests: IGithubPRNode[]
+): IGithubPRNode[] {
+  return pullrequests.filter((pullrequest: IGithubPRNode) => {
     return pullrequest.node.mergeable === 'UNKNOWN';
   });
 }
