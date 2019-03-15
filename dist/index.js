@@ -6,7 +6,7 @@ const util_1 = require("./lib/util");
 const tools = new actions_toolkit_1.Toolkit({
     event: ['pull_request.closed']
 });
-const conflictLabelName = process.env['CONFLICT_LABEL_NAME'];
+const conflictLabelName = process.env.CONFLICT_LABEL_NAME;
 const maxRetries = 5;
 const waitMs = 5000;
 (async () => {
@@ -21,13 +21,14 @@ const waitMs = 5000;
     }
     let labelData;
     try {
-        labelData = await queries_1.getLabels(tools, tools.context.repo());
+        labelData = await queries_1.getLabels(tools, tools.context.repo(), conflictLabelName);
     }
     catch (error) {
         tools.exit.failure('getLabels request failed');
     }
     // fetch label data
-    let conflictLabel = labelData.repository.labels.edges.find((label) => {
+    // note we have to iterate over the labels despite the query since query match is quite fuzzy
+    const conflictLabel = labelData.repository.labels.edges.find((label) => {
         return label.node.name === conflictLabelName;
     });
     if (!conflictLabel) {
