@@ -12,7 +12,7 @@ export const getPullRequests = (
 ) => {
   const query = `{
     repository(owner: "${owner}", name: "${repo}") {
-      pullRequests(last: 50, states:OPEN) {
+      pullRequests(last: 50, states: OPEN) {
         edges {
           node {
             id
@@ -28,7 +28,6 @@ export const getPullRequests = (
     headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
   });
 };
-
 
 export const getLabels = (
   tools: Toolkit,

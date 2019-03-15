@@ -3,20 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPullRequests = (tools, { owner, repo }) => {
     const query = `{
     repository(owner: "${owner}", name: "${repo}") {
-      pullRequests(last: 50, states:OPEN) {
+      pullRequests(last: 50, states: OPEN) {
         edges {
           node {
             id
             number
             mergeable
-            labels(first:100) {
-              edges {
-                node {
-                  id
-                  name
-                }
-              }
-            }
           }
         }
       }
@@ -26,10 +18,10 @@ exports.getPullRequests = (tools, { owner, repo }) => {
         headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
     });
 };
-exports.getLabels = (tools, { owner, repo }) => {
+exports.getLabels = (tools, { owner, repo }, labelName) => {
     const query = `{
     repository(owner: "${owner}", name: "${repo}") {
-      labels(first: 100) {
+      labels(first: 100, query: "${labelName}") {
         edges {
           node {
             id
