@@ -1,17 +1,17 @@
-export interface GithubLabelNode {
+export interface IGithubLabelNode {
   node: {
     id: string;
     name: string;
   }
 }
 
-export interface GithubPRNode {
+export interface IGithubPRNode {
   node: {
     id: string;
     number: string;
     mergeable: string;
     labels: {
-      edges: [GithubLabelNode]
+      edges: [IGithubLabelNode]
     }
   }
 }

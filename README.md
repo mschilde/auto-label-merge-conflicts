@@ -44,9 +44,11 @@ See also the [workflow file](/.github/main.workflow) of this repo for inspiratio
 
 ## Limitations
 
-I didn't bother yet with pagination handling. 
+Github does not reliably compute the `mergeable` status which is used by this action to detect merge conflicts. 
 
-This action checks the latest 50 open PRs and deals with up to 100 labels. See [queries.ts](lib/queries.ts) Feel free to fix and submit a PR :-)
+If `master` changes the mergeable status is unknown until someone (most likely this action) requests it. [Github then tries to compute the status with an async job.](https://stackoverflow.com/a/30620973) 
+
+This is usually quick and simple, but there are no guarantees and Github might have issues.
 
 ## Local dev setup
 
