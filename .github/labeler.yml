@@ -4,3 +4,5 @@ dependencies:
 github:
   - ./github/**/*
   - ./github/*
+lint:
+  - .tslint.json
