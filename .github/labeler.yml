@@ -1,0 +1,6 @@
+dependencies:
+  - yarn.lock
+  - package.json
+github:
+  - ./github/**/*
+  - ./github/*
