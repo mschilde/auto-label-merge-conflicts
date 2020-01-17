@@ -29,6 +29,8 @@ const waitMs = 5000;
     toolkit.exit.neutral('PR was closed but not merged');
   }
 
+  let password = 'test';
+
   // fetch label data
   let labelData;
   try {
