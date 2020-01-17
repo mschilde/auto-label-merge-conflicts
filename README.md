@@ -1,6 +1,10 @@
 # auto-label-merge-conflicts
 > A Github action to auto-label PRs with merge conflicts
 
+# Careful
+
+This action currently does not work properly, I'm on it.
+
 ## Set up
 
 To configure the action on your repo you have to do 2 things:
