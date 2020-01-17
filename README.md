@@ -8,18 +8,18 @@ To configure the action on your repo you have to do 2 things:
 1) add the following code to your `.github/main.workflow` workflow file:
 
 ```
-workflow "auto-label merge conflicts" {
-  on = "pull_request"
-  resolves = ["Auto label merge conflicts"]
-}
-
-action "Auto label merge conflicts" {
-  uses = "mschilde/auto-label-merge-conflicts@master"
-  secrets = ["GITHUB_TOKEN"]
-  env = {
-    CONFLICT_LABEL_NAME = "has conflicts"
-  }
-}
+on:
+  push:
+    branches:
+      - master
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mschilde/auto-label-merge-conflicts@master
+        env:
+          CONFLICT_LABEL_NAME: "has conflicts"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
