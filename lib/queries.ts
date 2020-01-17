@@ -1,12 +1,13 @@
-import { Toolkit } from 'actions-toolkit';
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import { Context } from '@actions/github/lib/context';
 import { IGithubPRNode } from './interfaces';
 
-const getPullRequestPages = (tools: Toolkit, cursor?: string) => {
+const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: string) => {
   let query;
-  const context = tools.context.repo();
   if (cursor) {
     query = `{
-      repository(owner: "${context.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo}") {
         pullRequests(first: 100, states: OPEN, after: "${cursor}") {
           edges {
             node {
@@ -33,7 +34,7 @@ const getPullRequestPages = (tools: Toolkit, cursor?: string) => {
     }`;
   } else {
     query = `{
-      repository(owner: "${context.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo}") {
         pullRequests(first: 100, states: OPEN) {
           edges {
             node {
@@ -60,14 +61,14 @@ const getPullRequestPages = (tools: Toolkit, cursor?: string) => {
     }`;
   }
 
-  return tools.github.graphql(query, {
+  return octokit.graphql(query, {
     headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
   });
 };
 
 // fetch all PRs
 export const getPullRequests = async (
-  tools: Toolkit
+  octokit: github.GitHub, context: Context
 ): Promise<IGithubPRNode[]> => {
   let pullrequestData;
   let pullrequests: IGithubPRNode[] = [];
@@ -76,9 +77,9 @@ export const getPullRequests = async (
 
   while (hasNextPage) {
     try {
-      pullrequestData = await getPullRequestPages(tools, cursor);
+      pullrequestData = await getPullRequestPages(octokit, context, cursor);
     } catch (error) {
-      tools.exit.failure('getPullRequests request failed');
+      core.setFailed('getPullRequests request failed');
     }
 
     pullrequests = pullrequests.concat(
@@ -92,10 +93,9 @@ export const getPullRequests = async (
   return pullrequests;
 };
 
-export const getLabels = (tools: Toolkit, labelName: string) => {
-  const context = tools.context.repo();
+export const getLabels = (octokit: github.GitHub, context: Context, labelName: string) => {
   const query = `{
-    repository(owner: "${context.owner}", name: "${context.repo}") {
+    repository(owner: "${context.repo.owner}", name: "${context.repo}") {
       labels(first: 100, query: "${labelName}") {
         edges {
           node {
@@ -107,13 +107,13 @@ export const getLabels = (tools: Toolkit, labelName: string) => {
     }
   }`;
 
-  return tools.github.graphql(query, {
+  return octokit.graphql(query, {
     headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
   });
 };
 
 export const addLabelsToLabelable = (
-  tools: Toolkit,
+  octokit: github.GitHub,
   {
     labelIds,
     labelableId
@@ -129,7 +129,7 @@ export const addLabelsToLabelable = (
       }
     }`;
 
-  return tools.github.graphql(query, {
+  return octokit.graphql(query, {
     headers: { Accept: 'application/vnd.github.starfire-preview+json' }
   });
 };

@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: mschilde/auto-label-merge-conflicts@master
-        env:
-          CONFLICT_LABEL_NAME: "has conflicts"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          conflictLabelName: "has conflicts"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
