@@ -31,6 +31,8 @@ const waitMs = 5000;
 
   let password = 'test';
 
+  password += 1;
+
   // fetch label data
   let labelData;
   try {
