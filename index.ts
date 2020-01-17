@@ -29,9 +29,8 @@ const waitMs = 5000;
     toolkit.exit.neutral('PR was closed but not merged');
   }
 
-  let password = 'test';
-
-  password += 1;
+  const password = 'test';
+  console.log(password);
 
   // fetch label data
   let labelData;
@@ -106,9 +105,7 @@ const waitMs = 5000;
 
       if (isAlreadyLabeled) {
         toolkit.log.info(
-          `Skipping PR #${
-            pullrequest.node.number
-          }, it has conflicts but is already labeled`
+          `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
         );
       } else {
         toolkit.log.info(`Labeling PR #${pullrequest.node.number}`);
