@@ -24,17 +24,22 @@ const waitMs = 5000;
   } catch (error) {
     core.setFailed('getLabels request failed');
   }
-  // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
-  const conflictLabel = labelData.repository.labels.edges.find(
-    (label: IGithubLabelNode) => {
-      return label.node.name === conflictLabelName;
-    }
-  );
 
-  if (!conflictLabel) {
-    core.setFailed(
-      `"${conflictLabelName}" label not found in your repository!`
+  let conflictLabel: IGithubLabelNode;
+
+  if (labelData) {
+    // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
+    conflictLabel = labelData.repository.labels.edges.find(
+      (label: IGithubLabelNode) => {
+        return label.node.name === conflictLabelName;
+      }
     );
+
+    if (!conflictLabel) {
+      core.setFailed(
+        `"${conflictLabelName}" label not found in your repository!`
+      );
+    }
   }
 
   let pullRequests!: IGithubPRNode[];
@@ -56,7 +61,7 @@ const waitMs = 5000;
     }
 
     try {
-      pullRequests = await getPullRequests(toolkit);
+      pullRequests = await getPullRequests(octokit, github.context);
     } catch (error) {
       core.setFailed('getPullRequests request failed');
     }
@@ -97,7 +102,7 @@ const waitMs = 5000;
       } else {
         core.debug(`Labeling PR #${pullrequest.node.number}`);
         try {
-          await addLabelsToLabelable(toolkit, {
+          await addLabelsToLabelable(octokit, {
             labelIds: conflictLabel.node.id,
             labelableId: pullrequest.node.id
           });

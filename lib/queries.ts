@@ -72,7 +72,7 @@ export const getPullRequests = async (
 ): Promise<IGithubPRNode[]> => {
   let pullrequestData;
   let pullrequests: IGithubPRNode[] = [];
-  let cursor;
+  let cursor: string | undefined;
   let hasNextPage = true;
 
   while (hasNextPage) {
@@ -82,12 +82,16 @@ export const getPullRequests = async (
       core.setFailed('getPullRequests request failed');
     }
 
-    pullrequests = pullrequests.concat(
-      pullrequestData.repository.pullRequests.edges
-    );
+    if (!pullrequestData || !pullrequestData.repository) {
+      core.setFailed('getPullRequests request failed');
+    } else {
+      pullrequests = pullrequests.concat(
+        pullrequestData.repository.pullRequests.edges
+      );
 
-    cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
-    hasNextPage = pullrequestData.repository.pullRequests.pageInfo.hasNextPage;
+      cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
+      hasNextPage = pullrequestData.repository.pullRequests.pageInfo.hasNextPage;
+    }
   }
 
   return pullrequests;
