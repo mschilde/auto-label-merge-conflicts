@@ -79,7 +79,6 @@ export const getPullRequests = async (
     try {
       pullrequestData = await getPullRequestPages(octokit, context, cursor);
     } catch (error) {
-      hasNextPage = false;
       core.setFailed('getPullRequests request failed: ' + error);
     }
 
