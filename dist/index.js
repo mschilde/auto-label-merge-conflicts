@@ -16,7 +16,7 @@ const waitMs = 5000;
         labelData = await queries_1.getLabels(octokit, github.context, conflictLabelName);
     }
     catch (error) {
-        core.setFailed('getLabels request failed');
+        core.setFailed('getLabels request failed: ' + error);
     }
     let conflictLabel;
     if (labelData) {
