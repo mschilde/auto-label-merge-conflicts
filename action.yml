@@ -9,5 +9,5 @@ inputs:
     description: 'Github token / secret'
     required: true
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: 'docker'
+  image: 'Dockerfile'
