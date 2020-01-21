@@ -84,7 +84,7 @@ export const getPullRequests = async (
 
     if (!pullrequestData || !pullrequestData.repository) {
       hasNextPage = false;
-      core.setFailed('getPullRequests request failed');
+      core.setFailed('getPullRequests request failed: ' + pullrequestData);
     } else {
       pullrequests = pullrequests.concat(
         pullrequestData.repository.pullRequests.edges

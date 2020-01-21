@@ -63,7 +63,7 @@ const waitMs = 5000;
     try {
       pullRequests = await getPullRequests(octokit, github.context);
     } catch (error) {
-      core.setFailed('getPullRequests request failed');
+      core.setFailed('getPullRequests request failed:' + error);
     }
 
     // check if there are PRs with unknown mergeable status

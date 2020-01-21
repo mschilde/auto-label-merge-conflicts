@@ -74,10 +74,11 @@ exports.getPullRequests = async (octokit, context) => {
             pullrequestData = await getPullRequestPages(octokit, context, cursor);
         }
         catch (error) {
-            core.setFailed('getPullRequests request failed');
+            core.setFailed('getPullRequests request failed: ' + error);
         }
         if (!pullrequestData || !pullrequestData.repository) {
-            core.setFailed('getPullRequests request failed');
+            hasNextPage = false;
+            core.setFailed('getPullRequests request failed: ' + pullrequestData);
         }
         else {
             pullrequests = pullrequests.concat(pullrequestData.repository.pullRequests.edges);
