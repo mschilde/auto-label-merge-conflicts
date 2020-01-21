@@ -79,10 +79,12 @@ export const getPullRequests = async (
     try {
       pullrequestData = await getPullRequestPages(octokit, context, cursor);
     } catch (error) {
-      core.setFailed('getPullRequests request failed');
+      hasNextPage = false;
+      core.setFailed('getPullRequests request failed: ' + error);
     }
 
     if (!pullrequestData || !pullrequestData.repository) {
+      hasNextPage = false;
       core.setFailed('getPullRequests request failed');
     } else {
       pullrequests = pullrequests.concat(
