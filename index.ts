@@ -11,7 +11,7 @@ import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 const conflictLabelName = core.getInput('conflictLabelName');
 const myToken = core.getInput('githubToken');
 
-core.debug(myToken)
+core.debug(myToken);
 
 const octokit = new github.GitHub(myToken);
 const maxRetries = 5;

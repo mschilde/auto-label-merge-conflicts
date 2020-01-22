@@ -89,6 +89,8 @@ exports.getPullRequests = async (octokit, context) => {
     return pullrequests;
 };
 exports.getLabels = (octokit, context, labelName) => {
+    core.debug(octokit);
+    core.debug(context);
     const query = `{
     repository(owner: "${context.repo.owner}", name: "${context.repo}") {
       labels(first: 100, query: "${labelName}") {
