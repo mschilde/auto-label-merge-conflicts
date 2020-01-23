@@ -7,7 +7,7 @@ const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: 
   let query;
   if (cursor) {
     query = `{
-      repository(owner: "${context.repo.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
         pullRequests(first: 100, states: OPEN, after: "${cursor}") {
           edges {
             node {
@@ -34,7 +34,7 @@ const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: 
     }`;
   } else {
     query = `{
-      repository(owner: "${context.repo.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
         pullRequests(first: 100, states: OPEN) {
           edges {
             node {
@@ -99,10 +99,8 @@ export const getPullRequests = async (
 };
 
 export const getLabels = (octokit: github.GitHub, context: Context, labelName: string) => {
-  core.debug(octokit as any);
-  core.debug(context as any);
   const query = `{
-    repository(owner: "${context.repo.owner}", name: "${context.repo}") {
+    repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
       labels(first: 100, query: "${labelName}") {
         edges {
           node {

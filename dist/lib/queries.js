@@ -5,7 +5,7 @@ const getPullRequestPages = (octokit, context, cursor) => {
     let query;
     if (cursor) {
         query = `{
-      repository(owner: "${context.repo.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
         pullRequests(first: 100, states: OPEN, after: "${cursor}") {
           edges {
             node {
@@ -33,7 +33,7 @@ const getPullRequestPages = (octokit, context, cursor) => {
     }
     else {
         query = `{
-      repository(owner: "${context.repo.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
         pullRequests(first: 100, states: OPEN) {
           edges {
             node {
@@ -89,10 +89,8 @@ exports.getPullRequests = async (octokit, context) => {
     return pullrequests;
 };
 exports.getLabels = (octokit, context, labelName) => {
-    core.debug(octokit);
-    core.debug(context);
     const query = `{
-    repository(owner: "${context.repo.owner}", name: "${context.repo}") {
+    repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
       labels(first: 100, query: "${labelName}") {
         edges {
           node {
