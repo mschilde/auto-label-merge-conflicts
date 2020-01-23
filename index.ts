@@ -8,7 +8,7 @@ import {
 } from './lib/queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
-const conflictLabelName = core.getInput('conflictLabelName', {
+const conflictLabelName = core.getInput('INPUT_CONFLICT_LABEL_NAME', {
   required: true
 });
 const myToken = core.getInput('githubToken', {
