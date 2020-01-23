@@ -4,13 +4,13 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const queries_1 = require("./lib/queries");
 const util_1 = require("./lib/util");
-const conflictLabelName = core.getInput('INPUT_CONFLICT_LABEL_NAME', {
+const conflictLabelName = core.getInput('CONFLICT_LABEL_NAME', {
     required: true
 });
 const myToken = core.getInput('githubToken', {
     required: true
 });
-console.log(process.env);
+core.debug(myToken);
 const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
