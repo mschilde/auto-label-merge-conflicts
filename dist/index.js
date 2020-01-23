@@ -10,7 +10,7 @@ const conflictLabelName = core.getInput('INPUT_CONFLICT_LABEL_NAME', {
 const myToken = core.getInput('githubToken', {
     required: true
 });
-core.debug(myToken);
+console.log(process.env);
 const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
