@@ -12,7 +12,7 @@ const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
 console.log('----');
-console.log(github.context);
+console.log(conflictLabelName);
 console.log('----');
 console.log(github.context.repo);
 (async () => {
