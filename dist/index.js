@@ -6,10 +6,11 @@ const queries_1 = require("./lib/queries");
 const util_1 = require("./lib/util");
 const conflictLabelName = core.getInput('conflictLabelName');
 const myToken = core.getInput('githubToken');
-core.debug(myToken);
+console.log(myToken);
 const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
+console.log(github.context);
 (async () => {
     // fetch label data
     let labelData;
