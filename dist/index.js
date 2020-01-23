@@ -4,8 +4,12 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const queries_1 = require("./lib/queries");
 const util_1 = require("./lib/util");
-const conflictLabelName = core.getInput('conflictLabelName');
-const myToken = core.getInput('githubToken');
+const conflictLabelName = core.getInput('conflictLabelName', {
+    required: true
+});
+const myToken = core.getInput('githubToken', {
+    required: true
+});
 console.log('----');
 console.log(myToken);
 const octokit = new github.GitHub(myToken);

@@ -1,5 +1,5 @@
-import * as core from '@actions/core'
-import * as github from '@actions/github'
+import * as core from '@actions/core';
+import * as github from '@actions/github';
 import { IGithubLabelNode, IGithubPRNode } from './lib/interfaces';
 import {
   addLabelsToLabelable,
@@ -8,8 +8,12 @@ import {
 } from './lib/queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
-const conflictLabelName = core.getInput('conflictLabelName');
-const myToken = core.getInput('githubToken');
+const conflictLabelName = core.getInput('conflictLabelName', {
+  required: true
+});
+const myToken = core.getInput('githubToken', {
+  required: true
+});
 
 core.debug(myToken);
 
@@ -18,7 +22,6 @@ const maxRetries = 5;
 const waitMs = 5000;
 
 (async () => {
-
   // fetch label data
   let labelData;
   try {
@@ -97,9 +100,7 @@ const waitMs = 5000;
 
       if (isAlreadyLabeled) {
         core.debug(
-          `Skipping PR #${
-            pullrequest.node.number
-          }, it has conflicts but is already labeled`
+          `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
         );
       } else {
         core.debug(`Labeling PR #${pullrequest.node.number}`);
