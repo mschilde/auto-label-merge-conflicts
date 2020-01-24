@@ -74,7 +74,7 @@ const waitMs = 5000;
             });
             if (isAlreadyLabeled) {
                 console.log(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
-                core.setOutput('info',`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
+                core.debug(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
             }
             else {
                 core.debug(`Labeling PR #${pullrequest.node.number}`);
@@ -93,7 +93,7 @@ const waitMs = 5000;
     }
     else {
         // nothing to do
-        core.setOutput('info', 'No PR has conflicts, congrats!');
+        core.debug('No PR has conflicts, congrats!');
         console.log('nothing to do');
     }
 })();
