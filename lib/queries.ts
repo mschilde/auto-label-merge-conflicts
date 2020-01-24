@@ -129,7 +129,7 @@ export const addLabelsToLabelable = (
 ) => {
   const query = `
     mutation {
-      addLabelsToLabelable(input: {labelIds: ${labelIds}, labelableId: "${labelableId}"}) {
+      addLabelsToLabelable(input: {labelIds: [${labelIds}], labelableId: "${labelableId}"}) {
         clientMutationId
       }
     }`;
