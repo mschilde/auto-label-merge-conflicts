@@ -5,7 +5,7 @@ inputs:
   CONFLICT_LABEL_NAME:
     description: 'label name used to marked PRs with merge conflicts'
     required: true
-  githubToken:
+  GITHUB_TOKEN:
     description: 'Github token / secret'
     required: true
 runs:
@@ -13,4 +13,4 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.CONFLICT_LABEL_NAME }}
-    - ${{ inputs.githubToken }}
+    - ${{ inputs.GITHUB_TOKEN }}

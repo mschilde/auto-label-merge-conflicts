@@ -7,10 +7,9 @@ const util_1 = require("./lib/util");
 const conflictLabelName = core.getInput('CONFLICT_LABEL_NAME', {
     required: true
 });
-const myToken = core.getInput('githubToken', {
+const myToken = core.getInput('GITHUB_TOKEN', {
     required: true
 });
-core.debug(myToken);
 const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
@@ -23,6 +22,7 @@ const waitMs = 5000;
     catch (error) {
         core.setFailed('getLabels request failed: ' + error);
     }
+    console.log(labelData);
     let conflictLabel;
     if (labelData) {
         // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
@@ -56,6 +56,7 @@ const waitMs = 5000;
         // check if there are PRs with unknown mergeable status
         pullrequestsWithoutMergeStatus = util_1.getPullrequestsWithoutMergeStatus(pullRequests);
     }
+    console.log(pullRequests);
     // after $maxRetries we give up, probably Github has some issues
     if (pullrequestsWithoutMergeStatus.length > 0) {
         core.setFailed('Cannot determine mergeable status!');
@@ -66,6 +67,7 @@ const waitMs = 5000;
     });
     // label PRs with conflicts
     if (pullrequestsWithConflicts.length > 0) {
+        console.log(pullrequestsWithConflicts);
         pullrequestsWithConflicts.forEach(async (pullrequest) => {
             const isAlreadyLabeled = pullrequest.node.labels.edges.find((label) => {
                 return label.node.id === conflictLabel.node.id;
@@ -90,5 +92,6 @@ const waitMs = 5000;
     else {
         // nothing to do
         core.setOutput('info', 'No PR has conflicts, congrats!');
+        console.log('nothing to do');
     }
 })();
