@@ -5,7 +5,7 @@
 
 To configure the action on your repo you have to do 2 things:
  
-1) configure the new workflow in your `.github` folder:
+1) configure the new workflow in your `.github/workflows` folder:
 
 ```
 on:
@@ -21,6 +21,8 @@ jobs:
           CONFLICT_LABEL_NAME: "has conflicts"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+Check out [this repo](./github/workflows/label_merge_conflicts.yml) for inspiration.
 
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
 
