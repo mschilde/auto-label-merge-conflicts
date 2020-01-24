@@ -108,7 +108,7 @@ exports.getLabels = (octokit, context, labelName) => {
 exports.addLabelsToLabelable = (octokit, { labelIds, labelableId }) => {
     const query = `
     mutation {
-      addLabelsToLabelable(input: {labelIds: [${labelIds}], labelableId: "${labelableId}"}) {
+      addLabelsToLabelable(input: {labelIds: ["${labelIds}"], labelableId: "${labelableId}"}) {
         clientMutationId
       }
     }`;
