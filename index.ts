@@ -107,6 +107,7 @@ const waitMs = 5000;
             labelIds: conflictLabel.node.id,
             labelableId: pullrequest.node.id
           });
+          core.debug(`...done`);
         } catch (error) {
           core.setFailed('addLabelsToLabelable request failed: ' + error);
         }
