@@ -66,7 +66,7 @@ const waitMs = 5000;
     try {
       pullRequests = await getPullRequests(octokit, github.context);
     } catch (error) {
-      core.setFailed('getPullRequests request failed:' + error);
+      core.setFailed('getPullRequests request failed: ' + error);
     }
 
     // check if there are PRs with unknown mergeable status
@@ -108,7 +108,7 @@ const waitMs = 5000;
             labelableId: pullrequest.node.id
           });
         } catch (error) {
-          core.setFailed('addLabelsToLabelable request failed');
+          core.setFailed('addLabelsToLabelable request failed: ' + error);
         }
       }
     });
