@@ -73,10 +73,12 @@ const waitMs = 5000;
                 return label.node.id === conflictLabel.node.id;
             });
             if (isAlreadyLabeled) {
-                core.debug(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
+                console.log(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
+                core.setOutput('info',`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
             }
             else {
                 core.debug(`Labeling PR #${pullrequest.node.number}`);
+                console.log(`Labeling PR #${pullrequest.node.number}`);
                 try {
                     await queries_1.addLabelsToLabelable(octokit, {
                         labelIds: conflictLabel.node.id,
