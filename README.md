@@ -5,7 +5,7 @@
 
 To configure the action on your repo you have to do 2 things:
  
-1) add the following code to your `.github/main.workflow` workflow file:
+1) configure the new workflow in your `.github` folder:
 
 ```
 on:
@@ -18,8 +18,8 @@ jobs:
     steps:
       - uses: mschilde/auto-label-merge-conflicts@master
         with:
-          conflictLabelName: "has conflicts"
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          CONFLICT_LABEL_NAME: "has conflicts"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
@@ -33,14 +33,6 @@ The idea is that after a PR is merged all other open Pull Requests are checked. 
 We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
 
 ![Github action in action](./demo.png)
-
-## Pitfalls
-
-Since this action runs post merge in a PR context it is only working if you don't immediately click the `delete branch` button after merging a PR. (I know, muscle memory)
-
-A good workaround is the [`branch cleanup`](https://github.com/jessfraz/branch-cleanup-action) action by @jessfraz
-
-See also the [workflow file](/.github/main.workflow) of this repo for inspiration.
 
 ## Limitations
 
