@@ -22,7 +22,6 @@ const waitMs = 5000;
     catch (error) {
         core.setFailed('getLabels request failed: ' + error);
     }
-    console.log(labelData);
     let conflictLabel;
     if (labelData) {
         // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
@@ -56,7 +55,6 @@ const waitMs = 5000;
         // check if there are PRs with unknown mergeable status
         pullrequestsWithoutMergeStatus = util_1.getPullrequestsWithoutMergeStatus(pullRequests);
     }
-    console.log(pullRequests);
     // after $maxRetries we give up, probably Github has some issues
     if (pullrequestsWithoutMergeStatus.length > 0) {
         core.setFailed('Cannot determine mergeable status!');
@@ -67,18 +65,15 @@ const waitMs = 5000;
     });
     // label PRs with conflicts
     if (pullrequestsWithConflicts.length > 0) {
-        console.log(pullrequestsWithConflicts);
         pullrequestsWithConflicts.forEach(async (pullrequest) => {
             const isAlreadyLabeled = pullrequest.node.labels.edges.find((label) => {
                 return label.node.id === conflictLabel.node.id;
             });
             if (isAlreadyLabeled) {
-                console.log(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
                 core.debug(`Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`);
             }
             else {
-                core.debug(`Labeling PR #${pullrequest.node.number}`);
-                console.log(`Labeling PR #${pullrequest.node.number}`);
+                core.debug(`Labeling PR #${pullrequest.node.number}...`);
                 try {
                     await queries_1.addLabelsToLabelable(octokit, {
                         labelIds: conflictLabel.node.id,
@@ -94,6 +89,5 @@ const waitMs = 5000;
     else {
         // nothing to do
         core.debug('No PR has conflicts, congrats!');
-        console.log('nothing to do');
     }
 })();

@@ -101,7 +101,7 @@ const waitMs = 5000;
           `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
         );
       } else {
-        core.debug(`Labeling PR #${pullrequest.node.number}`);
+        core.debug(`Labeling PR #${pullrequest.node.number}...`);
         try {
           await addLabelsToLabelable(octokit, {
             labelIds: conflictLabel.node.id,
@@ -114,6 +114,6 @@ const waitMs = 5000;
     });
   } else {
     // nothing to do
-    core.setOutput('info', 'No PR has conflicts, congrats!');
+    core.debug('No PR has conflicts, congrats!');
   }
 })();
