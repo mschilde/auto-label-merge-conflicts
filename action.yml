@@ -1,6 +1,9 @@
 name: 'Auto-label merge conflicts'
 description: 'Github Action to automatically label PRs with "conflict" label'
 author: 'Marko Schilde'
+branding:
+  icon: 'alert-octagon'
+  color: 'red'
 inputs:
   CONFLICT_LABEL_NAME:
     description: 'label name used to marked PRs with merge conflicts'
