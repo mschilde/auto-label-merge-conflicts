@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-Check out [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/.github/workflows/label_merge_conflicts.yml) for inspiration.
+Check out [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/%2Egithub/workflows/label_merge_conflicts.yml) for inspiration.
 
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
 
