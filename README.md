@@ -3,7 +3,7 @@
 
 ## Purpose
 
-This action checks all open Pull Requests for merge conflicts and marks them with a label.
+This action checks all open Pull Requests for merge conflicts and marks them with a Github label.
 
 ![Github action in action](./demo.png)
 
