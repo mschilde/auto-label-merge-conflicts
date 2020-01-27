@@ -1,6 +1,14 @@
 # auto-label-merge-conflicts
 > A Github action to auto-label PRs with merge conflicts
 
+## Purpose
+
+This action checks all open Pull Requests for merge conflicts and marks them with a label.
+
+![Github action in action](./demo.png)
+
+The typical use case is to run this action post merge (e.g. push to `master`). We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
+
 ## Set up
 
 To configure the action on your repo you have to do 2 things:
@@ -27,14 +35,6 @@ Check out [this repo](./github/workflows/label_merge_conflicts.yml) for inspirat
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
 
 This label will then be applied to PRs with merge conflicts. Just set it up manually if you haven't done so.
-
-## What does this action do?
-
-The idea is that after a PR is merged all other open Pull Requests are checked. Those with a merge conflict are marked with a label.
-
-We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
-
-![Github action in action](./demo.png)
 
 ## Limitations
 
