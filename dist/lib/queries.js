@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const getPullRequestPages = (tools, cursor) => {
+const core = require("@actions/core");
+const getPullRequestPages = (octokit, context, cursor) => {
     let query;
-    const context = tools.context.repo();
     if (cursor) {
         query = `{
-      repository(owner: "${context.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
         pullRequests(first: 100, states: OPEN, after: "${cursor}") {
           edges {
             node {
@@ -33,7 +33,7 @@ const getPullRequestPages = (tools, cursor) => {
     }
     else {
         query = `{
-      repository(owner: "${context.owner}", name: "${context.repo}") {
+      repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
         pullRequests(first: 100, states: OPEN) {
           edges {
             node {
@@ -59,33 +59,38 @@ const getPullRequestPages = (tools, cursor) => {
       }
     }`;
     }
-    return tools.github.graphql(query, {
+    return octokit.graphql(query, {
         headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
     });
 };
 // fetch all PRs
-exports.getPullRequests = async (tools) => {
+exports.getPullRequests = async (octokit, context) => {
     let pullrequestData;
     let pullrequests = [];
     let cursor;
     let hasNextPage = true;
     while (hasNextPage) {
         try {
-            pullrequestData = await getPullRequestPages(tools, cursor);
+            pullrequestData = await getPullRequestPages(octokit, context, cursor);
         }
         catch (error) {
-            tools.exit.failure('getPullRequests request failed');
+            core.setFailed('getPullRequests request failed: ' + error);
         }
-        pullrequests = pullrequests.concat(pullrequestData.repository.pullRequests.edges);
-        cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
-        hasNextPage = pullrequestData.repository.pullRequests.pageInfo.hasNextPage;
+        if (!pullrequestData || !pullrequestData.repository) {
+            hasNextPage = false;
+            core.setFailed('getPullRequests request failed: ' + pullrequestData);
+        }
+        else {
+            pullrequests = pullrequests.concat(pullrequestData.repository.pullRequests.edges);
+            cursor = pullrequestData.repository.pullRequests.pageInfo.endCursor;
+            hasNextPage = pullrequestData.repository.pullRequests.pageInfo.hasNextPage;
+        }
     }
     return pullrequests;
 };
-exports.getLabels = (tools, labelName) => {
-    const context = tools.context.repo();
+exports.getLabels = (octokit, context, labelName) => {
     const query = `{
-    repository(owner: "${context.owner}", name: "${context.repo}") {
+    repository(owner: "${context.repo.owner}", name: "${context.repo.repo}") {
       labels(first: 100, query: "${labelName}") {
         edges {
           node {
@@ -96,18 +101,18 @@ exports.getLabels = (tools, labelName) => {
       }
     }
   }`;
-    return tools.github.graphql(query, {
+    return octokit.graphql(query, {
         headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
     });
 };
-exports.addLabelsToLabelable = (tools, { labelIds, labelableId }) => {
+exports.addLabelsToLabelable = (octokit, { labelIds, labelableId }) => {
     const query = `
     mutation {
-      addLabelsToLabelable(input: {labelIds: ${labelIds}, labelableId: "${labelableId}"}) {
+      addLabelsToLabelable(input: {labelIds: ["${labelIds}"], labelableId: "${labelableId}"}) {
         clientMutationId
       }
     }`;
-    return tools.github.graphql(query, {
+    return octokit.graphql(query, {
         headers: { Accept: 'application/vnd.github.starfire-preview+json' }
     });
 };

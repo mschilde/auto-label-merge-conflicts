@@ -1,4 +1,5 @@
-import { Toolkit } from 'actions-toolkit';
+import * as core from '@actions/core';
+import * as github from '@actions/github';
 import { IGithubLabelNode, IGithubPRNode } from './lib/interfaces';
 import {
   addLabelsToLabelable,
@@ -7,46 +8,41 @@ import {
 } from './lib/queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
-const toolkit = new Toolkit({
-  event: ['pull_request.closed']
+const conflictLabelName = core.getInput('CONFLICT_LABEL_NAME', {
+  required: true
+});
+const myToken = core.getInput('GITHUB_TOKEN', {
+  required: true
 });
 
-const conflictLabelName = process.env.CONFLICT_LABEL_NAME!;
+const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
 
 (async () => {
-  // check configuration
-  if (!conflictLabelName) {
-    toolkit.exit.failure('Please set environment variable CONFLICT_LABEL_NAME');
-  }
-
-  // only run on actual merges
-  if (
-    toolkit.context.payload.pull_request &&
-    !toolkit.context.payload.pull_request.merged
-  ) {
-    toolkit.exit.neutral('PR was closed but not merged');
-  }
-
   // fetch label data
   let labelData;
   try {
-    labelData = await getLabels(toolkit, conflictLabelName);
+    labelData = await getLabels(octokit, github.context, conflictLabelName);
   } catch (error) {
-    toolkit.exit.failure('getLabels request failed');
+    core.setFailed('getLabels request failed: ' + error);
   }
-  // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
-  const conflictLabel = labelData.repository.labels.edges.find(
-    (label: IGithubLabelNode) => {
-      return label.node.name === conflictLabelName;
-    }
-  );
 
-  if (!conflictLabel) {
-    toolkit.exit.failure(
-      `"${conflictLabelName}" label not found in your repository!`
+  let conflictLabel: IGithubLabelNode;
+
+  if (labelData) {
+    // note we have to iterate over the labels despite the 'query' since query match is quite fuzzy
+    conflictLabel = labelData.repository.labels.edges.find(
+      (label: IGithubLabelNode) => {
+        return label.node.name === conflictLabelName;
+      }
     );
+
+    if (!conflictLabel) {
+      core.setFailed(
+        `"${conflictLabelName}" label not found in your repository!`
+      );
+    }
   }
 
   let pullRequests!: IGithubPRNode[];
@@ -63,14 +59,14 @@ const waitMs = 5000;
     tries++;
     // if merge status is unknown for any PR, wait a bit and retry
     if (pullrequestsWithoutMergeStatus.length > 0) {
-      toolkit.log.info(`...waiting for mergeable info...`);
+      core.debug(`...waiting for mergeable info...`);
       await wait(waitMs);
     }
 
     try {
-      pullRequests = await getPullRequests(toolkit);
+      pullRequests = await getPullRequests(octokit, github.context);
     } catch (error) {
-      toolkit.exit.failure('getPullRequests request failed');
+      core.setFailed('getPullRequests request failed: ' + error);
     }
 
     // check if there are PRs with unknown mergeable status
@@ -81,7 +77,7 @@ const waitMs = 5000;
 
   // after $maxRetries we give up, probably Github has some issues
   if (pullrequestsWithoutMergeStatus.length > 0) {
-    toolkit.exit.failure('Cannot determine mergeable status!');
+    core.setFailed('Cannot determine mergeable status!');
   }
 
   let pullrequestsWithConflicts: IGithubPRNode[];
@@ -101,25 +97,24 @@ const waitMs = 5000;
       );
 
       if (isAlreadyLabeled) {
-        toolkit.log.info(
-          `Skipping PR #${
-            pullrequest.node.number
-          }, it has conflicts but is already labeled`
+        core.debug(
+          `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
         );
       } else {
-        toolkit.log.info(`Labeling PR #${pullrequest.node.number}`);
+        core.debug(`Labeling PR #${pullrequest.node.number}...`);
         try {
-          await addLabelsToLabelable(toolkit, {
+          await addLabelsToLabelable(octokit, {
             labelIds: conflictLabel.node.id,
             labelableId: pullrequest.node.id
           });
+          core.debug(`PR #${pullrequest.node.number} done`);
         } catch (error) {
-          toolkit.exit.failure('addLabelsToLabelable request failed');
+          core.setFailed('addLabelsToLabelable request failed: ' + error);
         }
       }
     });
   } else {
     // nothing to do
-    toolkit.exit.success('No PR has conflicts, congrats!');
+    core.debug('No PR has conflicts, congrats!');
   }
 })();

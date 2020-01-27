@@ -1,0 +1,16 @@
+name: 'Auto-label merge conflicts'
+description: 'Github Action to automatically label PRs with "conflict" label'
+author: 'Marko Schilde'
+inputs:
+  CONFLICT_LABEL_NAME:
+    description: 'label name used to marked PRs with merge conflicts'
+    required: true
+  GITHUB_TOKEN:
+    description: 'Github token / secret'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.CONFLICT_LABEL_NAME }}
+    - ${{ inputs.GITHUB_TOKEN }}
