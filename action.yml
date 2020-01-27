@@ -3,7 +3,7 @@ description: 'Github Action to automatically label PRs with "conflict" label'
 author: 'Marko Schilde'
 branding:
   icon: 'alert-octagon'
-  color: 'red'
+  color: 'gray-dark'
 inputs:
   CONFLICT_LABEL_NAME:
     description: 'label name used to marked PRs with merge conflicts'

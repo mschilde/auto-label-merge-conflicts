@@ -7,13 +7,15 @@ This action checks all open Pull Requests for merge conflicts and marks them wit
 
 ![Github action in action](./demo.png)
 
-The typical use case is to run this action post merge (e.g. push to `master`). We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
+The typical use case is to run this action post merge (e.g. push to `master`) to quickly see which other PRs are now in conflict.
+ 
+We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
 
 ## Set up
 
 To configure the action on your repo you have to do 2 things:
  
-1) configure the new workflow in your `.github/workflows` folder:
+1) configure the new workflow by creating a YML config file in your `.github/workflows` folder:
 
 ```
 on:
@@ -30,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-Check out [this repo](./github/workflows/label_merge_conflicts.yml) for inspiration.
+Check out [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/%2Egithub/workflows/label_merge_conflicts.yml) for inspiration.
 
 2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
 
