@@ -13,7 +13,7 @@ const myToken = core.getInput('GITHUB_TOKEN', {
 const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
-(async () => {
+async function run() {
     // fetch label data
     let labelData;
     try {
@@ -91,4 +91,8 @@ const waitMs = 5000;
         // nothing to do
         core.debug('No PR has conflicts, congrats!');
     }
+}
+exports.run = run;
+(async () => {
+    await run();
 })();

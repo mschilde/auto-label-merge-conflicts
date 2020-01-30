@@ -19,7 +19,7 @@ const octokit = new github.GitHub(myToken);
 const maxRetries = 5;
 const waitMs = 5000;
 
-(async () => {
+export async function run() {
   // fetch label data
   let labelData;
   try {
@@ -55,7 +55,7 @@ const waitMs = 5000;
   while (
     (pullrequestsWithoutMergeStatus.length > 0 && tries < maxRetries) ||
     tries === 0
-  ) {
+    ) {
     tries++;
     // if merge status is unknown for any PR, wait a bit and retry
     if (pullrequestsWithoutMergeStatus.length > 0) {
@@ -117,4 +117,8 @@ const waitMs = 5000;
     // nothing to do
     core.debug('No PR has conflicts, congrats!');
   }
+}
+
+(async () => {
+  await run()
 })();
