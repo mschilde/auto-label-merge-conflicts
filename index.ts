@@ -8,18 +8,18 @@ import {
 } from './lib/queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './lib/util';
 
-const conflictLabelName = core.getInput('CONFLICT_LABEL_NAME', {
-  required: true
-});
-const myToken = core.getInput('GITHUB_TOKEN', {
-  required: true
-});
-
-const octokit = new github.GitHub(myToken);
-const maxRetries = 5;
-const waitMs = 5000;
-
 export async function run() {
+  const conflictLabelName = core.getInput('CONFLICT_LABEL_NAME', {
+    required: true
+  });
+  const myToken = core.getInput('GITHUB_TOKEN', {
+    required: true
+  });
+
+  const octokit = new github.GitHub(myToken);
+  const maxRetries = 5;
+  const waitMs = 5000;
+
   // fetch label data
   let labelData;
   try {
