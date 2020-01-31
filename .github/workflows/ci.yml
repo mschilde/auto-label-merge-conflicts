@@ -1,0 +1,20 @@
+name: CI
+on: [push]
+jobs:
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: checkout
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: install
+        run: yarn install
+      - name: lint
+        run: yarn lint
+      - name: build
+        run: yarn build
+      - name: test
+        run: yarn test
