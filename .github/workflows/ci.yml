@@ -5,17 +5,10 @@ on: [push]
 jobs:
   test:
     name: Test on node ${{ matrix.node }} and ${{ matrix.os }}
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        node: [8, 10, 12]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Use node ${{ matrix.node }}
+      - name: checkout
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
