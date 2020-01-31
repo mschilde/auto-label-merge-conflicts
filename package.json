@@ -5,9 +5,9 @@
   "author": "Marko Schilde",
   "version": "2.0",
   "scripts": {
-    "typecheck": "tsc --noEmit",
     "build": "yarn lint && rm -rf dist && tsc -p ./tsconfig.json",
-    "lint": "tslint -p ./tsconfig.json *.ts"
+    "lint": "tslint -p ./tsconfig.json *.ts",
+    "test": "jest"
   },
   "dependencies": {
     "@actions/core": "*",
@@ -15,11 +15,14 @@
     "@actions/github": "*"
   },
   "devDependencies": {
+    "@types/jest": "^24.9.1",
     "@types/node": "^10.17.13",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^25.1.0",
     "prettier": "^1.19.1",
+    "ts-jest": "^25.1.0",
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.14.0",
     "typescript": "^3.7.4",
