@@ -14,5 +14,6 @@ module.exports = {
       tsConfig: './tsconfig.json'
     }
   },
-  preset: 'ts-jest'
+  preset: 'ts-jest',
+  testResultsProcessor: 'jest-sonar-reporter'
 };
