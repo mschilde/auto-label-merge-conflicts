@@ -8,6 +8,8 @@ This action checks all open Pull Requests for merge conflicts and marks them wit
 ![Github action in action](./demo.png)
 
 The typical use case is to run this action post merge (e.g. push to `master`) to quickly see which other PRs are now in conflict.
+
+Unfortunately, there is no way for users to subsrcibe to label changes, which means the label gets added, but no one knows. The alternative for that is to post a comment. You should then (and everyone suscribed to the thread) get a notification.
  
 We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo). Instead of a grumpy CTO pinging developers to fix their merge conflicts there's now a shiny bot.
 
@@ -30,6 +32,7 @@ jobs:
         with:
           CONFLICT_LABEL_NAME: "has conflicts"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT: 'Merge conflicts detected'
 ```
 
 Check out [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/%2Egithub/workflows/label_merge_conflicts.yml) for inspiration.
