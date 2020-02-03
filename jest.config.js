@@ -4,9 +4,7 @@ module.exports = {
   testRegex: '__tests__.*\\.(ts|js)$',
   testPathIgnorePatterns: [
     '/node_modules/',
-    '/dist/',
-    '/migration/',
-    '/helpers/'
+    '/dist/'
   ],
   globals: {
     'ts-jest': {
