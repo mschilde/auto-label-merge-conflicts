@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        run: |
+      - run: |
           git fetch --prune --unshallow
       - name: checkout
         uses: actions/setup-node@v1
