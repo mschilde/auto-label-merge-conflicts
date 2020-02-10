@@ -5,7 +5,11 @@ jobs:
     name: Test & Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          path: ''
+      - run: |
+          git fetch --prune --unshallow
       - name: checkout
         uses: actions/setup-node@v1
         with:
@@ -18,6 +22,8 @@ jobs:
         run: yarn build
       - name: test
         run: yarn test
+      - name: fix COV paths
+        run: cp test-report.xml test-report2.xml && sed 's/\/home\/runner\/work\/auto-label-merge-conflicts\/auto-label-merge-conflicts/\/github\/workspace/g' test-report2.xml > test-report.xml
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
