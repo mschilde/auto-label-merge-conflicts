@@ -1,7 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { IGithubLabelNode, IGithubPRNode } from './interfaces';
-import { addLabelsToLabelable, getLabels, getPullRequests } from './queries';
+import {
+  addLabelsToLabelable,
+  getLabels,
+  getPullRequests,
+  removeLabelsFromLabelable
+} from './queries';
 import { getPullrequestsWithoutMergeStatus, wait } from './util';
 
 export async function run() {
@@ -123,30 +128,32 @@ export async function run() {
 
   // unlabel PRs without conflicts
   if (pullrequestsWithConflictResolution.length > 0) {
-    pullrequestsWithConflictResolution.forEach(async (pullrequest: IGithubPRNode) => {
-      const isAlreadyLabeled = pullrequest.node.labels.edges.find(
-        (label: IGithubLabelNode) => {
-          return label.node.id === conflictLabel.node.id;
-        }
-      );
-
-      if (!isAlreadyLabeled) {
-        core.debug(
-          `Skipping PR #${pullrequest.node.number}, it has no conflicts and is not labeled`
+    pullrequestsWithConflictResolution.forEach(
+      async (pullrequest: IGithubPRNode) => {
+        const isAlreadyLabeled = pullrequest.node.labels.edges.find(
+          (label: IGithubLabelNode) => {
+            return label.node.id === conflictLabel.node.id;
+          }
         );
-      } else {
-        core.debug(`Unlabeling PR #${pullrequest.node.number}...`);
-        try {
-          await addLabelsToLabelable(octokit, {
-            labelIds: conflictLabel.node.id,
-            labelableId: pullrequest.node.id
-          });
-          core.debug(`PR #${pullrequest.node.number} done`);
-        } catch (error) {
-          core.setFailed('addLabelsToLabelable request failed: ' + error);
+
+        if (!isAlreadyLabeled) {
+          core.debug(
+            `Skipping PR #${pullrequest.node.number}, it has no conflicts and is not labeled`
+          );
+        } else {
+          core.debug(`Unlabeling PR #${pullrequest.node.number}...`);
+          try {
+            await removeLabelsFromLabelable(octokit, {
+              labelIds: conflictLabel.node.id,
+              labelableId: pullrequest.node.id
+            });
+            core.debug(`PR #${pullrequest.node.number} done`);
+          } catch (error) {
+            core.setFailed('addLabelsToLabelable request failed: ' + error);
+          }
         }
       }
-    });
+    );
   } else {
     // nothing to do
     core.debug('No PR has conflicts, congrats!');

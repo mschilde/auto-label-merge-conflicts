@@ -107,7 +107,7 @@ async function run() {
             else {
                 core.debug(`Unlabeling PR #${pullrequest.node.number}...`);
                 try {
-                    await queries_1.addLabelsToLabelable(octokit, {
+                    await queries_1.removeLabelsFromLabelable(octokit, {
                         labelIds: conflictLabel.node.id,
                         labelableId: pullrequest.node.id
                     });
