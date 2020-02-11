@@ -3,7 +3,7 @@
   "description": "Github Action to automatically label PRs with 'conflict' label",
   "private": true,
   "author": "Marko Schilde",
-  "version": "2.1",
+  "version": "2.2",
   "scripts": {
     "build": "yarn lint && rm -rf dist && tsc -p ./tsconfig.json",
     "lint": "tslint -p ./tsconfig.json *.ts",

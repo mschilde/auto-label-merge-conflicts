@@ -3,9 +3,11 @@
 
 ## Purpose
 
-This action checks all open Pull Requests for merge conflicts and marks them with a Github label.
+This action checks all open Pull Requests for merge conflicts and marks them with a Github label. 
 
 ![Github action in action](./demo.png)
+
+Once a conflict is resolved the label is automatically removed.
 
 The typical use case is to run this action post merge (e.g. push to `master`) to quickly see which other PRs are now in conflict.
  
@@ -14,8 +16,12 @@ We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo
 ## Set up
 
 To configure the action on your repo you have to do 2 things:
+
+1) pick a Github label that should be used to mark PRs with conflicts
+
+This label will then be managed by this action. It will be added to PRs with merge conflicts and removed from PRs without conflicts.
  
-1) configure the new workflow by creating a YML config file in your `.github/workflows` folder:
+2) configure the new workflow by creating a YML config file in your `.github/workflows` folder:
 
 ```
 on:
@@ -32,11 +38,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-Check out [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/%2Egithub/workflows/label_merge_conflicts.yml) for inspiration.
+The label from step 1 should be referenced in the parameter `CONFLICT_LABEL_NAME`
 
-2) make sure the label referenced in the parameter `CONFLICT_LABEL_NAME` exists on your repo
-
-This label will then be applied to PRs with merge conflicts. Just set it up manually if you haven't done so.
+Take a look at [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/%2Egithub/workflows/label_merge_conflicts.yml) for an example setup.
 
 ## Limitations
 

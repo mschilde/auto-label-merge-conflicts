@@ -91,5 +91,37 @@ async function run() {
         // nothing to do
         core.debug('No PR has conflicts, congrats!');
     }
+    let pullrequestsWithConflictResolution;
+    pullrequestsWithConflictResolution = pullRequests.filter((pullrequest) => {
+        return pullrequest.node.mergeable !== 'CONFLICTING';
+    });
+    // unlabel PRs without conflicts
+    if (pullrequestsWithConflictResolution.length > 0) {
+        pullrequestsWithConflictResolution.forEach(async (pullrequest) => {
+            const isAlreadyLabeled = pullrequest.node.labels.edges.find((label) => {
+                return label.node.id === conflictLabel.node.id;
+            });
+            if (!isAlreadyLabeled) {
+                core.debug(`Skipping PR #${pullrequest.node.number}, it has no conflicts and is not labeled`);
+            }
+            else {
+                core.debug(`Unlabeling PR #${pullrequest.node.number}...`);
+                try {
+                    await queries_1.removeLabelsFromLabelable(octokit, {
+                        labelIds: conflictLabel.node.id,
+                        labelableId: pullrequest.node.id
+                    });
+                    core.debug(`PR #${pullrequest.node.number} done`);
+                }
+                catch (error) {
+                    core.setFailed('addLabelsToLabelable request failed: ' + error);
+                }
+            }
+        });
+    }
+    else {
+        // nothing to do
+        core.debug('No PR has conflicts, congrats!');
+    }
 }
 exports.run = run;

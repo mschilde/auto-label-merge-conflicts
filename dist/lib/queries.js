@@ -116,3 +116,14 @@ exports.addLabelsToLabelable = (octokit, { labelIds, labelableId }) => {
         headers: { Accept: 'application/vnd.github.starfire-preview+json' }
     });
 };
+exports.removeLabelsFromLabelable = (octokit, { labelIds, labelableId }) => {
+    const query = `
+    mutation {
+      removeLabelsFromLabelable(input: {labelIds: ["${labelIds}"], labelableId: "${labelableId}"}) {
+        clientMutationId
+      }
+    }`;
+    return octokit.graphql(query, {
+        headers: { Accept: 'application/vnd.github.starfire-preview+json' }
+    });
+};
