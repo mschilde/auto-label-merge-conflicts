@@ -62,7 +62,7 @@ const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: 
   }
 
   return octokit.graphql(query, {
-    headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
+    headers: { Accept: 'application/vnd.github+json' }
   });
 };
 
@@ -113,11 +113,11 @@ export const getLabels = (octokit: github.GitHub, context: Context, labelName: s
   }`;
 
   return octokit.graphql(query, {
-    headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
+    headers: { Accept: 'application/vnd.github+json' }
   });
 };
 
-export const addLabelsToLabelable = (
+export const addLabel = (
   octokit: github.GitHub,
   {
     labelIds,
@@ -135,6 +135,53 @@ export const addLabelsToLabelable = (
     }`;
 
   return octokit.graphql(query, {
-    headers: { Accept: 'application/vnd.github.starfire-preview+json' }
+    headers: { Accept: 'application/vnd.github+json' }
+  });
+};
+
+// Add comment to the PR.
+export const addComment = (
+  text: string,
+  octokit: github.GitHub,
+  {
+    nodeID
+  }: {
+    nodeID: string;
+  }
+) => {
+  core.debug("l. 152");
+  const query = `
+    mutation {
+      addComment(input: {body: "${text}", subjectId: "${nodeID}"}) {
+        clientMutationId
+      }
+    }`;
+    core.debug("l. 159");
+
+  return octokit.graphql(query, {
+    headers: { Accept: 'application/vnd.github+json' }
+  });
+};
+
+// Remove comment from the PR. The text in that comment comes from
+export const removeLabel = (
+  octokit: github.GitHub,
+  {
+    labelIds,
+    labelableId
+  }: {
+    labelIds: string;
+    labelableId: string;
+  }
+) => {
+  const query = `
+    mutation {
+      removeLabelsFromLabelable(input: {labelableId: "${labelIds}", labelIds: "${labelableId}"}) {
+        clientMutationId
+      }
+    }`;
+
+  return octokit.graphql(query, {
+    headers: { Accept: 'application/vnd.github+json' }
   });
 };

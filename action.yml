@@ -11,9 +11,13 @@ inputs:
   GITHUB_TOKEN:
     description: 'Github token / secret'
     required: true
+  COMMENT:
+    description: 'Text to be commented on the PR. If not set, nothing will be commented.'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
     - ${{ inputs.CONFLICT_LABEL_NAME }}
     - ${{ inputs.GITHUB_TOKEN }}
+    - ${{ inputs.COMMENT }}

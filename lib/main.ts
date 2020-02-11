@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { IGithubLabelNode, IGithubPRNode } from './interfaces';
-import { addLabelsToLabelable, getLabels, getPullRequests } from './queries';
-import { getPullrequestsWithoutMergeStatus, wait } from './util';
+import { addLabel, getLabels, getPullRequests, addComment, removeLabel } from './queries';
+import { getUnknownMergeStatusPRs, wait, getMergeablePRs, getConflictingPRs } from './util';
 
 export async function run() {
   const conflictLabelName = core.getInput('CONFLICT_LABEL_NAME', {
@@ -11,11 +11,24 @@ export async function run() {
   const myToken = core.getInput('GITHUB_TOKEN', {
     required: true
   });
-
+  let comment = core.getInput('COMMENT', {
+    required: false
+  });
   const octokit = new github.GitHub(myToken);
   const maxRetries = 5;
   const waitMs = 5000;
-
+  try {
+    octokit.graphql(`mutation MyMutation {
+      addComment(input: {subjectId: "MDExOlB1bGxSZXF1ZXN0MzY5OTUyNzE0", body: "rebase needed"}) {
+        clientMutationId
+      }
+    }`, {
+      headers: { Accept: 'application/vnd.github+json' }
+    });
+  } catch (error) {
+    
+  }
+  
   // fetch label data
   let labelData;
   try {
@@ -36,7 +49,7 @@ export async function run() {
 
     if (!conflictLabel) {
       core.setFailed(
-        `"${conflictLabelName}" label not found in your repository!`
+        `"${conflictLabelName}": label not found in your repository!`
       );
     }
   }
@@ -66,7 +79,7 @@ export async function run() {
     }
 
     // check if there are PRs with unknown mergeable status
-    pullrequestsWithoutMergeStatus = getPullrequestsWithoutMergeStatus(
+    pullrequestsWithoutMergeStatus = getUnknownMergeStatusPRs(
       pullRequests
     );
   }
@@ -76,16 +89,11 @@ export async function run() {
     core.setFailed('Cannot determine mergeable status!');
   }
 
-  let pullrequestsWithConflicts: IGithubPRNode[];
-  pullrequestsWithConflicts = pullRequests.filter(
-    (pullrequest: IGithubPRNode) => {
-      return pullrequest.node.mergeable === 'CONFLICTING';
-    }
-  );
+  let conflictingPRs = getConflictingPRs(pullRequests);
 
   // label PRs with conflicts
-  if (pullrequestsWithConflicts.length > 0) {
-    pullrequestsWithConflicts.forEach(async (pullrequest: IGithubPRNode) => {
+  if (conflictingPRs.length > 0) {
+    conflictingPRs.forEach(async (pullrequest: IGithubPRNode) => {
       const isAlreadyLabeled = pullrequest.node.labels.edges.find(
         (label: IGithubLabelNode) => {
           return label.node.id === conflictLabel.node.id;
@@ -97,20 +105,71 @@ export async function run() {
           `Skipping PR #${pullrequest.node.number}, it has conflicts but is already labeled`
         );
       } else {
-        core.debug(`Labeling PR #${pullrequest.node.number}...`);
+        core.debug(`Labelling and commenting PR #${pullrequest.node.number}...`);
         try {
-          await addLabelsToLabelable(octokit, {
+          await addLabel(octokit, {
             labelIds: conflictLabel.node.id,
             labelableId: pullrequest.node.id
           });
-          core.debug(`PR #${pullrequest.node.number} done`);
         } catch (error) {
-          core.setFailed('addLabelsToLabelable request failed: ' + error);
+          core.setFailed('addLabel request failed: ' + error);
         }
+        try {
+          core.debug('addComment :' + comment);
+          core.debug('PR#' + pullrequest.node.number);
+
+          await addComment(comment, octokit, {
+            nodeID: pullrequest.node.id
+          });
+          core.debug("l. 124");
+
+        } catch (error) {
+          core.debug('addComment request failed: ' + error);
+          core.setFailed('addComment request failed: ' + error);
+        }
+        core.debug(`PR #${pullrequest.node.number} done`);
       }
     });
   } else {
     // nothing to do
     core.debug('No PR has conflicts, congrats!');
   }
+
+  core.debug('L. 136');
+  let mergeablePRs = getMergeablePRs(pullRequests);
+
+  // remove label from PRs without conflicts
+  if (mergeablePRs.length > 0) {
+    mergeablePRs.forEach(async (pullrequest: IGithubPRNode) => {
+      const isLabeled = pullrequest.node.labels.edges.find(
+        (label: IGithubLabelNode) => {
+          return label.node.id === conflictLabel.node.id;
+        }
+      );
+
+      if (isLabeled) { // It is labeled but should not
+        core.debug(`Removing label from PR #${pullrequest.node.number}...`);
+        try {
+          await removeLabel(octokit, {
+            labelIds: conflictLabel.node.id,
+            labelableId: pullrequest.node.id
+          });
+          core.debug(`PR #${pullrequest.node.number} done`);
+        } catch (error) {
+          core.debug('removeLabel request failed: ' + error);
+          core.setFailed('removeLabel request failed: ' + error);
+        }
+      } else {
+        // PR is clean: no label to remove or to add.
+        // Nothing to do
+        core.debug(`PR #${pullrequest.node.number} is clean: no label to remove or to add.`);
+      }
+    });
+  } else {
+    // No PR without conflicts
+    // Nothing to do
+    core.debug('No PR without conflicts.');
+  }
+  core.debug('Whole shit done.');
+
 }

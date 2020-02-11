@@ -6,10 +6,26 @@ export async function wait(ms: number) {
   });
 }
 
-export function getPullrequestsWithoutMergeStatus(
+export function getUnknownMergeStatusPRs(
   pullrequests: IGithubPRNode[]
 ): IGithubPRNode[] {
   return pullrequests.filter((pullrequest: IGithubPRNode) => {
     return pullrequest.node.mergeable === 'UNKNOWN';
+  });
+}
+
+export function getMergeablePRs(
+  pullrequests: IGithubPRNode[]
+): IGithubPRNode[] {
+  return pullrequests.filter((pullrequest: IGithubPRNode) => {
+    return pullrequest.node.mergeable === 'MERGEABLE';
+  });
+}
+
+export function getConflictingPRs(
+  pullrequests: IGithubPRNode[]
+): IGithubPRNode[] {
+  return pullrequests.filter((pullrequest: IGithubPRNode) => {
+    return pullrequest.node.mergeable === 'CONFLICTING';
   });
 }

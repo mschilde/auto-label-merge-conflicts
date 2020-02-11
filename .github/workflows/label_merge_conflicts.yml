@@ -11,3 +11,4 @@ jobs:
         with:
           CONFLICT_LABEL_NAME: 'has conflicts'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT: 'Rebase needed'
