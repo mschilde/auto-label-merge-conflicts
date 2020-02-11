@@ -63,6 +63,11 @@ async function run() {
     pullrequestsWithConflicts = pullRequests.filter((pullrequest) => {
         return pullrequest.node.mergeable === 'CONFLICTING';
     });
+    let pullrequestsWithConflictResolution;
+    pullrequestsWithConflictResolution = pullRequests.filter((pullrequest) => {
+        return pullrequest.node.mergeable !== 'CONFLICTING';
+    });
+    core.debug(pullrequestsWithConflictResolution);
     // label PRs with conflicts
     if (pullrequestsWithConflicts.length > 0) {
         pullrequestsWithConflicts.forEach(async (pullrequest) => {

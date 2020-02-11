@@ -51,7 +51,7 @@ export async function run() {
   while (
     (pullrequestsWithoutMergeStatus.length > 0 && tries < maxRetries) ||
     tries === 0
-    ) {
+  ) {
     tries++;
     // if merge status is unknown for any PR, wait a bit and retry
     if (pullrequestsWithoutMergeStatus.length > 0) {
@@ -82,6 +82,15 @@ export async function run() {
       return pullrequest.node.mergeable === 'CONFLICTING';
     }
   );
+
+  let pullrequestsWithConflictResolution: IGithubPRNode[];
+  pullrequestsWithConflictResolution = pullRequests.filter(
+    (pullrequest: IGithubPRNode) => {
+      return pullrequest.node.mergeable !== 'CONFLICTING';
+    }
+  );
+
+  core.debug(pullrequestsWithConflictResolution as any);
 
   // label PRs with conflicts
   if (pullrequestsWithConflicts.length > 0) {
