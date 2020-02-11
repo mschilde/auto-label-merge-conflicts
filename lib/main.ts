@@ -90,7 +90,10 @@ export async function run() {
     }
   );
 
-  core.debug(pullrequestsWithConflictResolution as any);
+  pullrequestsWithConflictResolution.forEach((pr) => {
+    core.debug(pr as any);
+  })
+
 
   // label PRs with conflicts
   if (pullrequestsWithConflicts.length > 0) {
