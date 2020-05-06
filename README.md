@@ -23,7 +23,7 @@ This label will then be managed by this action. It will be added to PRs with mer
  
 2) configure the new workflow by creating a YML config file in your `.github/workflows` folder:
 
-```
+```yaml
 on:
   push:
     branches:
