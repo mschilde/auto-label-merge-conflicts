@@ -11,9 +11,19 @@ inputs:
   GITHUB_TOKEN:
     description: 'Github token / secret'
     required: true
+  MAX_RETRIES:
+    description: 'number of times to retry on a failed mergable check'
+    required: false
+    default: 5
+  WAIT_MS:
+    description: 'miliseconds between retries'
+    required: false
+    default: 5000
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
     - ${{ inputs.CONFLICT_LABEL_NAME }}
     - ${{ inputs.GITHUB_TOKEN }}
+    - ${{ inputs.MAX_RETRIES }}
+    - ${{ inputs.WAIT_MS }}
