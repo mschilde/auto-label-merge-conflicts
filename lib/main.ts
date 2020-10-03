@@ -122,7 +122,7 @@ export async function run() {
   let pullrequestsWithConflictResolution: IGithubPRNode[];
   pullrequestsWithConflictResolution = pullRequests.filter(
     (pullrequest: IGithubPRNode) => {
-      return pullrequest.node.mergeable !== 'CONFLICTING';
+      return pullrequest.node.mergeable === 'MERGEABLE';
     }
   );
 
