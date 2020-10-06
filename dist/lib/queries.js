@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeLabelsFromLabelable = exports.addLabelsToLabelable = exports.getLabels = exports.getPullRequests = void 0;
 const core = require("@actions/core");
 const getPullRequestPages = (octokit, context, cursor) => {
     let query;

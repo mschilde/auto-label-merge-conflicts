@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getPullrequestsWithoutMergeStatus = exports.wait = void 0;
 async function wait(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);

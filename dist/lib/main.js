@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
 const core = require("@actions/core");
 const github = require("@actions/github");
 const queries_1 = require("./queries");
