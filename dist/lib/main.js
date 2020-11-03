@@ -93,7 +93,7 @@ async function run() {
     }
     let pullrequestsWithConflictResolution;
     pullrequestsWithConflictResolution = pullRequests.filter((pullrequest) => {
-        return pullrequest.node.mergeable !== 'CONFLICTING';
+        return pullrequest.node.mergeable === 'MERGEABLE';
     });
     // unlabel PRs without conflicts
     if (pullrequestsWithConflictResolution.length > 0) {
