@@ -24,8 +24,3 @@ jobs:
         run: yarn test
       - name: fix COV paths
         run: cp test-report.xml test-report2.xml && sed 's/\/home\/runner\/work\/auto-label-merge-conflicts\/auto-label-merge-conflicts/\/github\/workspace/g' test-report2.xml > test-report.xml
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
