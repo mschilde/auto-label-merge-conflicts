@@ -36,11 +36,18 @@ jobs:
         with:
           CONFLICT_LABEL_NAME: "has conflicts"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_RETRIES: 5
+          WAIT_MS: 5000
 ```
 
 The label from step 1 should be referenced in the parameter `CONFLICT_LABEL_NAME`
 
 Take a look at [this repo](https://github.com/mschilde/auto-label-merge-conflicts/blob/master/%2Egithub/workflows/label_merge_conflicts.yml) for an example setup.
+
+### Arguments:
+
+* MAX_RETRIES: optional (default 5)
+* WAIT_MS: optional (default 5000)
 
 ## Limitations
 
@@ -49,6 +56,7 @@ Github does not reliably compute the `mergeable` status which is used by this ac
 If `master` changes the mergeable status is unknown until someone (most likely this action) requests it. [Github then tries to compute the status with an async job.](https://stackoverflow.com/a/30620973) 
 
 This is usually quick and simple, but there are no guarantees and Github might have issues.
+You can tweak `MAX_RETRIES` and `WAIT_MS` to increase the timeout before giving up on a Pull Request.
 
 ## Local dev setup
 
