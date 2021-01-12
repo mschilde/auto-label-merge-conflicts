@@ -18,8 +18,7 @@ We use this setup e.g. on our monorepo at [Comtravo](https://github.com/comtravo
 To configure the action on your repo you have to do 2 things:
 
 1) pick a Github label that should be used to mark PRs with conflicts
-
-This label will then be managed by this action. It will be added to PRs with merge conflicts and removed from PRs without conflicts.
+ This label will then be managed by this action. It will be added to PRs with merge conflicts and removed from PRs without conflicts.
  
 2) configure the new workflow by creating a YML config file in your `.github/workflows` folder:
 
@@ -46,8 +45,9 @@ Take a look at [this repo](https://github.com/mschilde/auto-label-merge-conflict
 
 ### Arguments:
 
-* MAX_RETRIES: optional (default 5)
-* WAIT_MS: optional (default 5000)
+* `CONFLICT_LABEL_NAME`: label used for marking conflicts, note that such label has to exist in your repo
+* `MAX_RETRIES`: optional (default 5)
+* `WAIT_MS`: optional (default 5000)
 
 ## Limitations
 
