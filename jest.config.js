@@ -1,17 +1,11 @@
 module.exports = {
+  clearMocks: true,
+  moduleFileExtensions: ['js', 'ts'],
   testEnvironment: 'node',
-  moduleFileExtensions: ['ts', 'js'],
-  testRegex: '__tests__.*\\.(ts|js)$',
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/'
-  ],
-  globals: {
-    'ts-jest': {
-      isolatedModules: true,
-      tsConfig: './tsconfig.json'
-    }
+  testMatch: ['**/*.test.ts'],
+  testRunner: 'jest-circus/runner',
+  transform: {
+    '^.+\\.ts$': 'ts-jest'
   },
-  preset: 'ts-jest',
-  testResultsProcessor: 'jest-sonar-reporter'
-};
+  verbose: true
+}

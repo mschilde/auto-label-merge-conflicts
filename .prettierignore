@@ -1,2 +1,3 @@
-dist
-*.d.ts
+dist/
+lib/
+node_modules/
