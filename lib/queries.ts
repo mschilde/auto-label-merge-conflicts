@@ -13,7 +13,7 @@ const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: 
             node {
               id
               number
-              mergeable
+              mergeStateStatus
               labels(first: 100) {
                 edges {
                   node {
@@ -40,7 +40,7 @@ const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: 
             node {
               id
               number
-              mergeable
+              mergeStateStatus
               labels(first: 100) {
                 edges {
                   node {
@@ -62,7 +62,7 @@ const getPullRequestPages = (octokit: github.GitHub, context: Context, cursor?: 
   }
 
   return octokit.graphql(query, {
-    headers: { Accept: 'application/vnd.github.ocelot-preview+json' }
+    headers: { Accept: 'application/vnd.github.merge-info-preview+json' }
   });
 };
 

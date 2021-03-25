@@ -28,6 +28,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    types:
+      - synchronize
 jobs:
   triage:
     runs-on: ubuntu-latest
