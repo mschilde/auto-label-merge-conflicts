@@ -62,7 +62,7 @@ async function run() {
     }
     let pullrequestsWithConflicts;
     pullrequestsWithConflicts = pullRequests.filter((pullrequest) => {
-        return pullrequest.node.mergeable === 'CONFLICTING';
+        return pullrequest.node.mergeable === 'DIRTY';
     });
     // label PRs with conflicts
     if (pullrequestsWithConflicts.length > 0) {
@@ -94,7 +94,7 @@ async function run() {
     }
     let pullrequestsWithConflictResolution;
     pullrequestsWithConflictResolution = pullRequests.filter((pullrequest) => {
-        return pullrequest.node.mergeable === 'MERGEABLE';
+        return pullrequest.node.mergeable !== 'DIRTY';
     });
     // unlabel PRs without conflicts
     if (pullrequestsWithConflictResolution.length > 0) {
