@@ -68,6 +68,7 @@ export async function run() {
     try {
       pullRequests = await getPullRequests(octokit, github.context);
     } catch (error) {
+      console.debug(error);
       core.setFailed('getPullRequests request failed: ' + error);
     }
 
@@ -79,6 +80,7 @@ export async function run() {
 
   // after $maxRetries we give up, probably Github has some issues
   if (pullrequestsWithoutMergeStatus.length > 0) {
+    pullrequestsWithoutMergeStatus.forEach(p => core.debug('Cannot determine mergeable status for PR #' + p.node.number));
     core.setFailed('Cannot determine mergeable status!');
   }
 
