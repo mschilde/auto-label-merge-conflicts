@@ -1,13 +1,8 @@
 dependencies:
-  - changed-files:
-      - any-glob-to-any-file:
-          - yarn.lock
-          - package.json
+  - yarn.lock
+  - package.json
 github:
-  - changed-files:
-      - any-glob-to-any-file:
-          - .github/**
+  - .github/*
+  - .github/**/*
 lint:
-  - changed-files:
-      - any-glob-to-any-file:
-          - .tslint.json
+  - .tslint.json
