@@ -20,3 +20,18 @@ jobs:
         run: yarn test
       - name: fix COV paths
         run: cp test-report.xml test-report2.xml && sed 's/\/home\/runner\/work\/auto-label-merge-conflicts\/auto-label-merge-conflicts/\/github\/workspace/g' test-report2.xml > test-report.xml
+
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
